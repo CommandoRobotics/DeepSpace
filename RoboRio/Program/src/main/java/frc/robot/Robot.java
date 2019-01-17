@@ -28,6 +28,10 @@ public class Robot extends TimedRobot {
 
   private Joystick joystick;
 
+  private int currentState;
+  private static final int DRIVER_CONTROL_STATE = 0;
+  private static final int COLOR_ALIGN_STATE = 1;
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -37,6 +41,8 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    this.currentState = DRIVER_CONTROL_STATE;
 
     joystick = new Joystick(0);
   }
@@ -51,7 +57,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    
+
   }
 
   /**
@@ -93,7 +99,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-
+    switch(currentState) {
+      case DRIVER_CONTROL_STATE:
+        break;
+      case COLOR_ALIGN_STATE:
+        break;
+    }
   }
 
   /**
