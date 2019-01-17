@@ -1,0 +1,1 @@
+This directory is for code we place on Rev Robotics hubs so we can use FTC robots for testing our FRC code.
