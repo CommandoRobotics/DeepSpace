@@ -16,11 +16,14 @@ public class ControllerManager {
     public void loadControlScheme(ControlScheme controlScheme) {
         this.trackedJoysticks.clear();
 
-        Map<Integer, int[]> joystickEntries = controlScheme.getTrackedJoysticks();
-        Set<Integer> joystickPorts = joystickEntries.keySet();
+        List<Integer> joystickPorts = controlScheme.getTrackedJoystickPorts();
+        Map<Integer, int[]> joystickAxes = controlScheme.getTrackedAxes();
+        Map<Integer, int[]> joystickButtons = controlScheme.getTrackedButtons();
+
         for(int port : joystickPorts) {
             TrackedJoystick trackedJoystick = new TrackedJoystick(port);
-            trackedJoystick.trackButtons(joystickEntries.get(port));
+            trackedJoystick.trackAxes(joystickAxes.get(port));
+            trackedJoystick.trackButtons(joystickButtons.get(port));
             this.trackedJoysticks.add(trackedJoystick);
         }
     }
