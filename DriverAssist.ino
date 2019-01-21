@@ -1,15 +1,12 @@
-#include 'ultrasonicAPI.h'
+#include "ultrasonicAPI.h"
 
 void setup(){
   
 }
 
-
-double ultrasonicDistance;
-
 void driverAssist(){
 
-  if(/*vision target is more than 1 foot 4 inches away*/){
+  if(/*vision target is more than 1 foot 4 inches away*/ && ultrasonicDistance > 42){
     if(/*vision target is on the left*/){
       //tell chassis to move left
     } else if(/*vision target is on the right*/){
@@ -19,7 +16,7 @@ void driverAssist(){
     } else {
       //alert driver of vision tracking failure
     }
-  } else if(/*ultrasonic sensor is less than 1 ft 4 inches away but more than 2 inches away*/){
+  } else if(ultrasonicDistance < 42){
     if(/*vision target is more than 2 degrees to the left*/){
       //strafe left slowly
     } else if(/*vision target is more than 2 degrees to the right*/){
@@ -42,6 +39,6 @@ void driverAssist(){
 }
 
 void loop(){
-  ultrasonicDistance = getDistanceUsingUltrasonic();
+  double ultrasonicDistance = getDistanceUsingUltrasonic();
   driverAssist();
 }
