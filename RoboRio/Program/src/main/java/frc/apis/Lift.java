@@ -7,12 +7,14 @@ import edu.wpi.first.wpilibj.Spark;
 
 public class Lift {
 
+    //How close to the target is close enough?
     private static final double ELEVATION_TOLERANCE = 1;
 
     private Spark lift;
     private Encoder encoder;
     private DigitalInput limitSwitch;
 
+    //Has the user given us an elvation to target?
     private boolean seekingElevation;
         private double targetElevation;
     
@@ -53,14 +55,23 @@ public class Lift {
         lift.set(0);
     }
 
+    //Set the motor's power based on our lift position relative to our target position.
     private void seekElevation(double power) {
-        if(targetElevation - ELEVATION_TOLERANCE > encoder.getDistance()) raiseLift(power);
-        else if(targetElevation + ELEVATION_TOLERANCE < encoder.getDistance()) lowerLift(power);
-        else stopLift();
+        if(targetElevation - ELEVATION_TOLERANCE > encoder.getDistance()) {
+            raiseLift(power);
+            seekingElevation = true;
+        } else if(targetElevation + ELEVATION_TOLERANCE < encoder.getDistance()) {
+            lowerLift(power);
+            seekingElevation = true;
+        } else {
+            stopLift();
+            seekingElevation = false;
+        }
     }
 
     public void setTargetElevation(double targetElevation) {
         this.targetElevation = targetElevation;
+        seekingElevation = true;
     }
 
     public double getTargetElevation() {

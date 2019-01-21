@@ -47,6 +47,10 @@ public class MecanumChassis extends MecanumDrive {
         super.driveCartesian(lateralSpeed, forwardSpeed, angle);
     }
 
+    public void driveMecanumPolar(double forwardSpeed, double angle, double rotationRate) {
+        super.drivePolar(forwardSpeed, angle, rotationRate);
+    }
+
     public void stop() {
         driveMecanum(0, 0, 0);
     }
@@ -67,12 +71,20 @@ public class MecanumChassis extends MecanumDrive {
         driveMecanum(Math.abs(power), 0, 0);
     }
 
-    public void driveAtClockwiseAngle(double power, double rotationRate) {
+    public void driveClockwiseInCircularPath(double power, double rotationRate) {
         driveMecanum(0, power, Math.abs(rotationRate));
     }
 
-    public void driveAtCounterClockwiseAngle(double power, double rotationRate) {
+    public void driveCounterClockwiseInCircularPath(double power, double rotationRate) {
         driveMecanum(0, power, -Math.abs(rotationRate));
+    }
+
+    public void driveWhileRotatingClockwse(double power, double angle, double rotationRate) {
+        driveMecanumPolar(power, angle, Math.abs(rotationRate));
+    }
+
+    public void driveWhileRotatingCounterClockwise(double power, double angle, double rotationRate) {
+        driveMecanumPolar(power, angle, -Math.abs(rotationRate));
     }
 
     public void rotateClockwise(double rotationRate) {
