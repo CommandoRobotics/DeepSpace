@@ -9,22 +9,26 @@ import edu.wpi.first.wpilibj.Joystick;
 
 public class TrackedJoystick extends Joystick {
 
+    private double deadZone;
+
+    private boolean receivedInput;
+
     private List<Integer> axesToTrack;
-    private Map<Integer, Boolean> axisJustPressed;
-    private Map<Integer, Boolean> axisHeld;
+    private Map<Integer, Boolean> axisJustMoved;
+    private Map<Integer, Boolean> axisMoved;
 
     private List<Integer> buttonsToTrack;
     private Map<Integer, Boolean> buttonJustPressed;
     private Map<Integer, Boolean> buttonHeld;
 
-    private boolean receivedInput;
-
     public TrackedJoystick(int portNumber) {
         super(portNumber);
 
+        this.deadZone = 0.02;
+
         this.axesToTrack = new ArrayList<>();
-        this.axisJustPressed = new HashMap<>();
-        this.axisHeld = new HashMap<>();
+        this.axisJustMoved = new HashMap<>();
+        this.axisMoved = new HashMap<>();
 
         this.buttonsToTrack = new ArrayList<>();
         this.buttonJustPressed = new HashMap<>();
@@ -33,15 +37,47 @@ public class TrackedJoystick extends Joystick {
         this.receivedInput = false;
     }
 
+    public void update() {
+        this.receivedInput = false;
+        
+        for(int axisToTrack : axesToTrack) {
+            boolean axisMoved = this.getRawAxis(axisToTrack) > deadZone;
+            
+            if(axisMoved) receivedInput = true;
+            this.axisMoved.put(axisToTrack, axisMoved);
+            axisJustMoved.put(axisToTrack, !axisJustMoved.get(axisToTrack) && axisMoved);
+        }
+
+        for(int buttonToTrack : buttonsToTrack) {
+            boolean buttonPressed = this.getRawButton(buttonToTrack);
+            
+            if(buttonPressed) receivedInput = true;
+            this.buttonHeld.put(buttonToTrack, buttonPressed);
+            buttonJustPressed.put(buttonToTrack, !buttonJustPressed.get(buttonToTrack) && buttonPressed);
+        }
+    }
+
+    public void setDeadZone(double deadZone) {
+        this.deadZone = deadZone;
+    }
+
+    public double getDeadZone() {
+        return deadZone;
+    }
+
+    public boolean receivedInput() {
+        return receivedInput;
+    }
+
     public void trackAxes(int... axesToTrack) {
         this.axesToTrack.clear();
-        this.axisJustPressed.clear();
-        this.axisHeld.clear();
+        this.axisJustMoved.clear();
+        this.axisMoved.clear();
 
         for(int axisToTrack : axesToTrack) {
             this.axesToTrack.add(axisToTrack);
-            this.axisJustPressed.put(axisToTrack, false);
-            this.axisHeld.put(axisToTrack, false);
+            this.axisJustMoved.put(axisToTrack, false);
+            this.axisMoved.put(axisToTrack, false);
         }
     }
 
@@ -57,38 +93,14 @@ public class TrackedJoystick extends Joystick {
         }
     }
 
-    public void update() {
-        this.receivedInput = false;
-        
-        for(int axisToTrack : axesToTrack) {
-            boolean axisPressed = this.getRawButton(axisToTrack);
-            
-            if(axisPressed) receivedInput = true;
-            this.axisHeld.put(axisToTrack, axisPressed);
-            axisJustPressed.put(axisToTrack, !axisJustPressed.get(axisToTrack) && axisPressed);
-        }
-
-        for(int buttonToTrack : buttonsToTrack) {
-            boolean buttonPressed = this.getRawButton(buttonToTrack);
-            
-            if(buttonPressed) receivedInput = true;
-            this.buttonHeld.put(buttonToTrack, buttonPressed);
-            buttonJustPressed.put(buttonToTrack, !buttonJustPressed.get(buttonToTrack) && buttonPressed);
-        }
-    }
-
-    public boolean receivedInput() {
-        return receivedInput;
-    }
-
     public boolean axisWasJustPressed(int axis) {
-        if(!axisJustPressed.containsKey(axis)) return false;
-        return axisJustPressed.get(axis);
+        if(!axisJustMoved.containsKey(axis)) return false;
+        return axisJustMoved.get(axis);
     }
 
     public boolean axisIsHeld(int axis) {
-        if(!axisHeld.containsKey(axis)) return false;
-        return axisHeld.get(axis);
+        if(!axisMoved.containsKey(axis)) return false;
+        return axisMoved.get(axis);
     }
 
     public boolean buttonWasJustPressed(int button) {
