@@ -1,6 +1,11 @@
+#include 'ultrasonicAPI.h'
+
 void setup(){
   
 }
+
+
+double ultrasonicDistance;
 
 void driverAssist(){
 
@@ -37,5 +42,6 @@ void driverAssist(){
 }
 
 void loop(){
+  ultrasonicDistance = getDistanceUsingUltrasonic();
   driverAssist();
 }
