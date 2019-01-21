@@ -3,14 +3,14 @@ void setup(){
 }
 
 void driverAssist(){
-  
+
   if(/*vision target is more than 1 foot 4 inches away*/){
     if(/*vision target is on the left*/){
-      
+      //tell chassis to move left
     } else if(/*vision target is on the right*/){
-      
+      //tell chassis to move right
     } else if(/*vision target is centered*/){
-      
+      //tell chassis to move straight
     } else {
       //alert driver of vision tracking failure
     }
@@ -37,5 +37,5 @@ void driverAssist(){
 }
 
 void loop(){
-  driverAssistAutoAlign();
+  driverAssist();
 }
