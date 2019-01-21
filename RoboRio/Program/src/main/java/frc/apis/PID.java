@@ -2,9 +2,18 @@ package frc.apis;
     
     public class PID {
         
+        //GAIN TERMS
+        //How much should each type of error affect the output?
         private double pGain, iGain, dGain;
+
+        //BIAS TERM
+        //If no error is experienced, this will be the output value.
         private double bias;
+
+        //TARGET VALUE
         private double target;
+
+        //ERROR
         private double previousError, accumulatedError;
         
         public PID(double pGain, double iGain, double dGain) {

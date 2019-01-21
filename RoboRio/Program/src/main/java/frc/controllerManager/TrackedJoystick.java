@@ -9,14 +9,19 @@ import edu.wpi.first.wpilibj.Joystick;
 
 public class TrackedJoystick extends Joystick {
 
+    //DEADZONE
     private double deadZone;
 
+    //INPUT
+    //Did we receive input this frame?
     private boolean receivedInput;
 
+    //JOYSTICK AXES
     private List<Integer> axesToTrack;
     private Map<Integer, Boolean> axisJustMoved;
     private Map<Integer, Boolean> axisMoved;
 
+    //JOYSTICK BUTTONS
     private List<Integer> buttonsToTrack;
     private Map<Integer, Boolean> buttonJustPressed;
     private Map<Integer, Boolean> buttonHeld;

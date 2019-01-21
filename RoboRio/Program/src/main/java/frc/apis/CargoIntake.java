@@ -5,7 +5,10 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 public class CargoIntake {
 
+    //INTAKE MOTORS
     private Spark[] motors;
+
+    //LIMIT SWITCH--If this triggeres, then we have a cargo in the robot
     private DigitalInput limitSwitch;
 
     private int intakeState;
@@ -13,8 +16,10 @@ public class CargoIntake {
     public static final int INTAKE_PULLING = 1;
     public static final int INTAKE_PUSHING = 2;
 
+    //Minimum power at which the motors will turn
     private double minimumPower;
 
+    //TODO: Change this to an absolute number of motor ports
     public CargoIntake(int limitSwitchPort, int... motorPorts) {
         this.limitSwitch = new DigitalInput(limitSwitchPort);
 
@@ -33,6 +38,7 @@ public class CargoIntake {
 
     public void update(double power) {
         if(limitSwitch.get()) {
+            //If the limit switch is active, we have cargo loaded. We can stop spinning the wheels.
             stopIntake();
         }
 
