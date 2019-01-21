@@ -7,7 +7,8 @@
 
 package frc.robot;
 
-import frc.controllerManager.controlSchemes.TwoJoystickControlScheme;
+import frc.apis.MecanumChassis;
+import frc.controllerManager.controlSchemes.*;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -23,7 +24,9 @@ public class Robot extends TimedRobot {
   private static final int DRIVER_CONTROL_STATE = 0;
   private static final int COLOR_ALIGN_STATE = 1;
 
-  private TwoJoystickControlScheme twoJoystickControlScheme;
+  private MecanumChassis chassis;
+
+  private TestControlScheme testControlScheme;
 
   @Override
   public void robotInit() {
@@ -33,7 +36,9 @@ public class Robot extends TimedRobot {
 
     this.currentState = DRIVER_CONTROL_STATE;
 
-    this.twoJoystickControlScheme = new TwoJoystickControlScheme(chassis);
+    this.chassis = new MecanumChassis(0, 1, 2, 3);
+
+    this.testControlScheme = new TestControlScheme();
   }
 
   @Override
@@ -65,6 +70,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     switch(currentState) {
       case DRIVER_CONTROL_STATE:
+        testControlScheme.controlRobot();
         break;
       case COLOR_ALIGN_STATE:
         break;

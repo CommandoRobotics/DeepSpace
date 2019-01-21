@@ -24,7 +24,7 @@ public class TrackedJoystick extends Joystick {
     public TrackedJoystick(int portNumber) {
         super(portNumber);
 
-        this.deadZone = 0.02;
+        this.deadZone = 0.1;
 
         this.axesToTrack = new ArrayList<>();
         this.axisJustMoved = new HashMap<>();
@@ -58,7 +58,7 @@ public class TrackedJoystick extends Joystick {
     }
 
     public void setDeadZone(double deadZone) {
-        this.deadZone = deadZone;
+        this.deadZone = Math.abs(deadZone);
     }
 
     public double getDeadZone() {
@@ -101,6 +101,12 @@ public class TrackedJoystick extends Joystick {
     public boolean axisIsHeld(int axis) {
         if(!axisMoved.containsKey(axis)) return false;
         return axisMoved.get(axis);
+    }
+
+    @Override
+    public double getRawAxis(int axis) {
+        double power = super.getRawAxis(axis);
+        return (Math.abs(power) > deadZone) ? power : 0;
     }
 
     public boolean buttonWasJustPressed(int button) {

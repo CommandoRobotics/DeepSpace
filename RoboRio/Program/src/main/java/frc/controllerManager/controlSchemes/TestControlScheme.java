@@ -9,8 +9,8 @@ public class TestControlScheme extends ControlScheme {
 
     public TestControlScheme() {
         super();
-        addJoystick(JOYSTICK_ONE_PORT, new int[]{0, 1}, new int[]{0, 1});
-        addJoystick(JOYSTICK_TWO_PORT, new int[]{0, 1}, new int[]{0, 1});
+        addJoystick(JOYSTICK_ONE_PORT, new int[]{X_AXIS}, new int[]{0, 1});
+        addJoystick(JOYSTICK_TWO_PORT, new int[]{Y_AXIS}, new int[]{0, 1});
     }
 
     @Override
@@ -19,8 +19,9 @@ public class TestControlScheme extends ControlScheme {
             joystick.update();
         }
 
-        System.out.println("Joystick 1 Axis 1: " + trackedJoysticks.get(1).getRawAxis(1));
-        System.out.println("Joystick 0 Axis 0: " + trackedJoysticks.get(0).getRawAxis(0));
+        System.out.println("Joystick 0 Axis 0: " + trackedJoysticks.get(0).getRawAxis(X_AXIS));
+        System.out.println("Joystick 1 Axis 1: " + trackedJoysticks.get(1).getRawAxis(Y_AXIS));
+        System.out.println();
     }
 
 }

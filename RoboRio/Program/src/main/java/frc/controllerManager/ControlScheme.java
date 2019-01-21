@@ -5,6 +5,9 @@ import java.util.ArrayList;
 
 public abstract class ControlScheme {
 
+    protected static final int X_AXIS = 0;
+    protected static final int Y_AXIS = 1;
+
     protected List<TrackedJoystick> trackedJoysticks;
 
     public ControlScheme() {

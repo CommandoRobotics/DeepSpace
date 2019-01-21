@@ -13,8 +13,8 @@ public class TwoJoystickControlScheme extends ControlScheme {
 
     public TwoJoystickControlScheme(MecanumChassis chassis) {
         super();
-        addJoystick(JOYSTICK_ONE_PORT, new int[]{0}, new int[]{0, 1});
-        addJoystick(JOYSTICK_TWO_PORT, new int[]{0}, new int[]{0, 1});
+        addJoystick(JOYSTICK_ONE_PORT, new int[]{Y_AXIS}, new int[]{0, 1});
+        addJoystick(JOYSTICK_TWO_PORT, new int[]{Y_AXIS}, new int[]{0, 1});
 
         this.chassis = chassis;
     }
