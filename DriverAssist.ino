@@ -6,7 +6,7 @@ void setup(){
 
 void driverAssist(){
 
-  if(/*vision target is more than 1 foot 4 inches away*/ && ultrasonicDistance > 42){
+  if(/*vision target is more than 1 foot 4 inches away*/ && getDistanceUsingUltrasonic() > 42){
     if(/*vision target is on the left*/){
       //tell chassis to move left
     } else if(/*vision target is on the right*/){
@@ -16,7 +16,7 @@ void driverAssist(){
     } else {
       //alert driver of vision tracking failure
     }
-  } else if(ultrasonicDistance < 42){
+  } else if(getDistanceUsingUltrasonic() < 42){
     if(/*vision target is more than 2 degrees to the left*/){
       //strafe left slowly
     } else if(/*vision target is more than 2 degrees to the right*/){
@@ -30,7 +30,7 @@ void driverAssist(){
         //drive straight
       }
     }
-  } else if(/*ultrasonic sensor is less than or equal to 2 inches away*/){
+  } else if(getDistanceUsingUltrasonic() < ){
     //tell rio clear to drop object
   } else {
     //alert driver of line up failure
@@ -39,6 +39,5 @@ void driverAssist(){
 }
 
 void loop(){
-  double ultrasonicDistance = getDistanceUsingUltrasonic();
   driverAssist();
 }
