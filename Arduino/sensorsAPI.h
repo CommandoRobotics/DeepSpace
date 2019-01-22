@@ -6,7 +6,7 @@
 
 void setupAPI(){
  setupLimitSwitch();
-
+ setupTouchlessEncoder();
 }
 
 //Returns the distance in centimeters
@@ -22,6 +22,8 @@ void setupLimitSwitch(){
   pinMode( 6 , INPUT );
 }
 
+//Returns true/false is limit switch activated
+//Requires that the limit switch is plugged into pin a6
 bool limitSwitchPressed(){
   if( digitalRead(6) == LOW ){
   return true;
@@ -29,7 +31,18 @@ bool limitSwitchPressed(){
   return false;
   }
 
+void setupTouchlessEncoder(){
+  pinMode( 5 , INPUT );
 }
+
+//Returns true/false is line in front of encoder
+//Requires that the limit switch is plugged into pin a5
+bool encoderSeesMark(){
+  if( digitalRead(5) == LOW ){
+  return true;
+  }else{
+  return false;
+  }
 
 
 
