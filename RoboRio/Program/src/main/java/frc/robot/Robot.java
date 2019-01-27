@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
 
     this.chassis = new MecanumChassis(0, 1, 2, 3);
 
-    this.testControlScheme = new TestControlScheme();
+    this.testControlScheme = new TestControlScheme(1, 2, 0, 3);//9,8,7,6
   }
 
   @Override
