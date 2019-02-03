@@ -8,6 +8,12 @@ public abstract class ControlScheme {
     //AXIS CONSTANTS
     protected static final int X_AXIS = 0;
     protected static final int Y_AXIS = 1;
+    protected static final int Z_AXIS = 2;
+
+    protected static final int LOGITECH_X_AXIS_1 = 0;
+    protected static final int LOGITECH_Y_AXIS_1 = 1;
+    protected static final int LOGITECH_X_AXIS_2 = 4;
+    protected static final int LOGITECH_Y_AXIS_2 = 5;    
 
     //JOYSTICKS
     //These joysticks are tracked for if they are receiving input and which input have just been activated (for toggling)

@@ -24,13 +24,18 @@ public class MecanumChassis extends MecanumDrive {
     private boolean hasGyroscope;
         private ADIS16448_IMU gyroscope;
     
-    public MecanumChassis(int frontLPort, int rearLPort, int frontRPort, int rearRPort) {
-        super(new Spark(frontLPort), new Spark(rearLPort), new Spark(frontRPort), new Spark(rearRPort));
+    //COMMUNICATIONS
+    private Communications communications;
+   
+    public MecanumChassis(Spark frontL, Spark rearL, Spark frontR, Spark rearR) {
+        super(frontL, rearL, frontR, rearR);
 
         this.seekingAngle = false;
             this.targetAngle = 0;
         
         this.hasGyroscope = false;
+
+        this.communications = new Communications(new int[]{}, new int[]{});
     }
 
     public void update() {
