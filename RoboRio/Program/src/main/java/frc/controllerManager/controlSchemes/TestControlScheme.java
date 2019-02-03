@@ -13,8 +13,8 @@ public class TestControlScheme extends ControlScheme {
 
     public TestControlScheme(int lfPort, int rfPort, int lrPort, int rrPort) {
         super();
-        addJoystick(JOYSTICK_ONE_PORT, new int[]{X_AXIS}, new int[]{0, 1});
-        addJoystick(JOYSTICK_TWO_PORT, new int[]{Y_AXIS}, new int[]{0, 1});
+        addJoystick(JOYSTICK_ONE_PORT, new int[]{X_AXIS}, new int[]{1, 2});
+        addJoystick(JOYSTICK_TWO_PORT, new int[]{Y_AXIS}, new int[]{1, 2});
 
         leftFront = new Spark(lfPort);
         rightFront = new Spark(rfPort);

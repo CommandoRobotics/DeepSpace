@@ -10,6 +10,9 @@ package frc.robot;
 import frc.apis.MecanumChassis;
 import frc.controllerManager.controlSchemes.*;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,9 +27,11 @@ public class Robot extends TimedRobot {
   private static final int DRIVER_CONTROL_STATE = 0;
   private static final int COLOR_ALIGN_STATE = 1;
 
+  private UsbCamera camera;
+
   private MecanumChassis chassis;
 
-  private TestControlScheme testControlScheme;
+  private TwoJoystickControlScheme controlScheme;
 
   @Override
   public void robotInit() {
@@ -36,9 +41,11 @@ public class Robot extends TimedRobot {
 
     this.currentState = DRIVER_CONTROL_STATE;
 
-    this.chassis = new MecanumChassis(0, 1, 2, 3);
+    camera = CameraServer.getInstance().startAutomaticCapture(0);
 
-    this.testControlScheme = new TestControlScheme(1, 2, 0, 3);//9,8,7,6
+    this.chassis = new MecanumChassis(new Spark(3), new Spark(1), new Spark(0), new Spark(2));
+
+    this.controlScheme = new TwoJoystickControlScheme(chassis);//9,8,7,6
   }
 
   @Override
@@ -69,11 +76,11 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     switch(currentState) {
-      case DRIVER_CONTROL_STATE:
-        testControlScheme.controlRobot();
-        break;
-      case COLOR_ALIGN_STATE:
-        break;
+       case DRIVER_CONTROL_STATE:
+         controlScheme.controlRobot();
+         break;
+       case COLOR_ALIGN_STATE:   
+         break;
     }
   }
 
