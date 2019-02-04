@@ -7,22 +7,16 @@
 
 package frc.robot;
 
-import frc.apis.MecanumChassis;
+import frc.apis.*;
 import frc.controllerManager.controlSchemes.*;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
-
   private int currentState;
   private static final int DRIVER_CONTROL_STATE = 0;
   private static final int COLOR_ALIGN_STATE = 1;
@@ -33,19 +27,24 @@ public class Robot extends TimedRobot {
 
   private TwoJoystickControlScheme controlScheme;
 
+  private Communications communications;
+
+  private boolean background;
+
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
-
     this.currentState = DRIVER_CONTROL_STATE;
 
     camera = CameraServer.getInstance().startAutomaticCapture(0);
 
+    background = true;
+    SmartDashboard.putBoolean(" ", background);
+
     this.chassis = new MecanumChassis(new Spark(3), new Spark(1), new Spark(0), new Spark(2));
 
     this.controlScheme = new TwoJoystickControlScheme(chassis);//9,8,7,6
+
+    this.communications = new Communications(new int[]{0, 1}, new int[]{}, new int[]{0, 1, 2}, new int[]{3});
   }
 
   @Override
@@ -55,26 +54,20 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
+
   }
 
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
-    }
+
   }
 
   @Override
   public void teleopPeriodic() {
+    SmartDashboard.putBoolean(" ", (background = !background));
+   
+    System.out.println();
+
     switch(currentState) {
        case DRIVER_CONTROL_STATE:
          controlScheme.controlRobot();
