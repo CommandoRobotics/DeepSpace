@@ -2,6 +2,7 @@ package frc.apis;
 
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class MecanumChassis extends MecanumDrive {
 
@@ -16,6 +17,9 @@ public class MecanumChassis extends MecanumDrive {
     //TOLERANCES
     private static final double ROTATION_TOLERANCE = 0.5;
 
+    //SPARKS
+    private Spark frontLeft, rearLeft, frontRight, rearRight;
+
     //CHASSIS STATE
     private boolean seekingAngle;
         private double targetAngle;
@@ -23,25 +27,36 @@ public class MecanumChassis extends MecanumDrive {
     //GYROSCOPE COMPONENT
     private boolean hasGyroscope;
         private ADIS16448_IMU gyroscope;
-    
-    //COMMUNICATIONS
-    private Communications communications;
    
     public MecanumChassis(Spark frontL, Spark rearL, Spark frontR, Spark rearR) {
         super(frontL, rearL, frontR, rearR);
+
+        this.frontLeft = frontL;
+        this.rearLeft = rearL;
+        this.frontRight = frontR;
+        this.rearRight = rearR;
+
+        updateSmartDashboard();
 
         this.seekingAngle = false;
             this.targetAngle = 0;
         
         this.hasGyroscope = false;
+    }
 
-        this.communications = new Communications(new int[]{}, new int[]{});
+    public void updateSmartDashboard() {
+        SmartDashboard.putNumber("Chassis Motor Front Left", frontLeft.get());
+        SmartDashboard.putNumber("Chassis Motor Front Right", frontRight.get());
+        SmartDashboard.putNumber("Chassis Motor Rear Left", rearLeft.get());
+        SmartDashboard.putNumber("Chassis Motor Rear Right", rearRight.get());
     }
 
     public void update() {
         if(seekingAngle) {
             rotateToAngle(targetAngle, 0.5);
         }
+
+        updateSmartDashboard();
     }
 
     public void addGyroscope(ADIS16448_IMU gyroscope) {
