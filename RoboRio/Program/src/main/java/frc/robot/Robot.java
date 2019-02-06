@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
 
   private MecanumChassis chassis;
 
-  private TwoJoystickControlScheme controlScheme;
+  private LogitechControlScheme controlScheme;
 
   private Communications communications;
 
@@ -42,7 +42,7 @@ public class Robot extends TimedRobot {
 
     this.chassis = new MecanumChassis(new Spark(3), new Spark(1), new Spark(0), new Spark(2));
 
-    this.controlScheme = new TwoJoystickControlScheme(chassis);//9,8,7,6
+    this.controlScheme = new LogitechControlScheme(chassis);//9,8,7,6
 
     this.communications = new Communications(new int[]{0, 1}, new int[]{}, new int[]{0, 1, 2}, new int[]{3});
   }

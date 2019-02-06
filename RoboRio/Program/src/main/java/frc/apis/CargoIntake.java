@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class CargoIntake {
 
     //INTAKE MOTORS
-    private Spark[] motors;
+    private Spark motor;
 
     //LIMIT SWITCH--If this triggeres, then we have a cargo in the robot
     private DigitalInput limitSwitch;
@@ -20,20 +20,14 @@ public class CargoIntake {
     private double minimumPower;
 
     //TODO: Change this to an absolute number of motor ports
-    public CargoIntake(int limitSwitchPort, int... motorPorts) {
-        this.limitSwitch = new DigitalInput(limitSwitchPort);
-
-        motors = new Spark[motorPorts.length];
-        for(int i = 0; i < motorPorts.length; i++) {
-            this.motors[i] = new Spark(motorPorts[i]);
-        }
-
-        this.minimumPower = 0.05;
+    public CargoIntake(int motorPort, int limitSwitchPort) {
+        this(new Spark(motorPort), new DigitalInput(limitSwitchPort));
     }
 
-    public CargoIntake(DigitalInput limitSwitch, Spark... motors) {
-        this.motors = motors;
+    public CargoIntake(Spark motor, DigitalInput limitSwitch) {
+        this.motor = motor;
         this.limitSwitch = limitSwitch;
+        this.minimumPower = 0.05;
     }
 
     public void update(double power) {
@@ -65,24 +59,18 @@ public class CargoIntake {
 
     public void pullCargo(double power) {
         double truePower = (Math.abs(power) > minimumPower) ? power : minimumPower;
-        for(Spark spark : motors) {
-            spark.set(Math.abs(truePower));
-        }
+        motor.set(Math.abs(truePower));
         intakeState = INTAKE_PULLING;
     }
 
     public void pushCargo(double power) {
-        double truePower = (Math.abs(power) > minimumPower) ? power : minimumPower;
-        for(Spark spark : motors) {
-            spark.set(-Math.abs(truePower));
-        }
+        double truePower = (Math.abs(power) > minimumPower) ? power : -minimumPower;
+        motor.set(-Math.abs(truePower));
         intakeState = INTAKE_PUSHING;
     }
 
     public void stopIntake() {
-        for(Spark spark : motors) {
-            spark.set(0);
-        }
+        motor.set(0);
         intakeState = INTAKE_INACTIVE;
     }
 
