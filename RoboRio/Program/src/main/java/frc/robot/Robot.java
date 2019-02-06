@@ -24,6 +24,8 @@ public class Robot extends TimedRobot {
   private UsbCamera camera;
 
   private MecanumChassis chassis;
+  private HatchMechanism hatchMechanism;
+  private CargoSystem cargoSystem;
 
   private LogitechControlScheme controlScheme;
 
@@ -41,8 +43,10 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean(" ", background);
 
     this.chassis = new MecanumChassis(new Spark(3), new Spark(1), new Spark(0), new Spark(2));
+    this.hatchMechanism = new HatchMechanism(0, 1);
+    this.cargoSystem = new CargoSystem(new CargoIntake(4, 0), new CargoConveyorBelt(7), new CargoOutput(5, 6));
 
-    this.controlScheme = new LogitechControlScheme(chassis);//9,8,7,6
+    this.controlScheme = new LogitechControlScheme(chassis, hatchMechanism, cargoSystem);//9,8,7,6
 
     this.communications = new Communications(new int[]{0, 1}, new int[]{}, new int[]{0, 1, 2}, new int[]{3});
   }

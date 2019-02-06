@@ -11,11 +11,6 @@ public class CargoIntake {
     //LIMIT SWITCH--If this triggeres, then we have a cargo in the robot
     private DigitalInput limitSwitch;
 
-    private int intakeState;
-    public static final int INTAKE_INACTIVE = 0;
-    public static final int INTAKE_PULLING = 1;
-    public static final int INTAKE_PUSHING = 2;
-
     //Minimum power at which the motors will turn
     private double minimumPower;
 
@@ -30,23 +25,11 @@ public class CargoIntake {
         this.minimumPower = 0.05;
     }
 
-    public void update(double power) {
+    public void update() {
         if(limitSwitch.get()) {
             //If the limit switch is active, we have cargo loaded. We can stop spinning the wheels.
-            stopIntake();
-        }
-
-        switch(intakeState) {
-            case INTAKE_PULLING:
-                pullCargo(power);
-                break;
-            case INTAKE_PUSHING:
-                pushCargo(power);
-                break;
-            default:
-                stopIntake();
-                break;
-        }
+            stop();
+        } 
     }
 
     public double getMinimumPower() {
@@ -60,22 +43,14 @@ public class CargoIntake {
     public void pullCargo(double power) {
         double truePower = (Math.abs(power) > minimumPower) ? power : minimumPower;
         motor.set(Math.abs(truePower));
-        intakeState = INTAKE_PULLING;
     }
 
     public void pushCargo(double power) {
         double truePower = (Math.abs(power) > minimumPower) ? power : -minimumPower;
         motor.set(-Math.abs(truePower));
-        intakeState = INTAKE_PUSHING;
     }
 
-    public void stopIntake() {
+    public void stop() {
         motor.set(0);
-        intakeState = INTAKE_INACTIVE;
     }
-
-    public boolean intakeIsActive() {
-        return intakeState != INTAKE_INACTIVE;
-    }
-
 }

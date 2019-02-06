@@ -36,4 +36,9 @@ public class CargoOutput {
         rightSpark.set(-Math.abs(truePower));
     }
 
+    public void stop() {
+        leftSpark.set(0);
+        rightSpark.set(0);
+    }
+
 }

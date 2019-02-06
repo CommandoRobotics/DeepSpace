@@ -32,4 +32,8 @@ public class CargoConveyorBelt {
         motor.set(-Math.abs(truePower));
     }
 
+    public void stop() {
+        motor.set(0);
+    }
+
 }

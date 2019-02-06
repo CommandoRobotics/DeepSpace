@@ -4,22 +4,25 @@ import edu.wpi.first.wpilibj.Solenoid;
 
 public class HatchMechanism {
 
-    private Solenoid solenoid;
+    private Solenoid solenoid1, solenoid2;
 
-    public HatchMechanism(int solenoidPort) {
-        this(new Solenoid(solenoidPort));
+    public HatchMechanism(int solenoidPort1, int solenoidPort2) {
+        this(new Solenoid(solenoidPort1), new Solenoid(solenoidPort2));
     }
 
-    public HatchMechanism(Solenoid solenoid) {
-        this.solenoid = solenoid;
+    public HatchMechanism(Solenoid solenoid1, Solenoid solenoid2) {
+        this.solenoid1 = solenoid1;
+        this.solenoid2 = solenoid2;
     }
 
     public void deploy() {
-        solenoid.set(true);
+        solenoid1.set(true);
+        solenoid2.set(true);
     }
 
     public void retract() {
-        solenoid.set(false);
+        solenoid1.set(false);
+        solenoid2.set(false);
     }
 
 }
