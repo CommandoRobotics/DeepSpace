@@ -24,10 +24,7 @@ public class LogitechControlScheme extends ControlScheme {
     public LogitechControlScheme(MecanumChassis chassis, HatchMechanism hatchMechanism,
         CargoSystem cargoSystem) {
         super();
-        addJoystick(JOYSTICK_ONE_PORT,
-            new int[]{LOGITECH_X_AXIS_1, LOGITECH_Y_AXIS_1,
-                    LOGITECH_X_AXIS_2, LOGITECH_LEFT_TRIGGER, LOGITECH_RIGHT_TRIGGER},
-            new int[]{LOGITECH_TOP_BUTTON, LOGITECH_BOTTOM_BUTTON});
+        addJoystick(JOYSTICK_ONE_PORT, new int[]{}, new int[]{});
 
         logitech = trackedJoysticks.get(0);
 

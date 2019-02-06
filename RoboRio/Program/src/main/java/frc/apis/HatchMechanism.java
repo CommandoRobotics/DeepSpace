@@ -17,11 +17,11 @@ public class HatchMechanism {
 
     public void deploy() {
         solenoid1.set(true);
-        solenoid2.set(true);
+        solenoid2.set(false);
     }
 
     public void retract() {
-        solenoid1.set(false);
+        solenoid1.set(true);
         solenoid2.set(false);
     }
 
