@@ -1,6 +1,7 @@
 package frc.controllerManager.controlSchemes;
 
 import frc.apis.MecanumChassis;
+import edu.wpi.first.wpilibj.Timer;
 import frc.apis.CargoSystem;
 import frc.apis.HatchMechanism;
 import frc.controllerManager.ControlScheme;
@@ -8,7 +9,8 @@ import frc.controllerManager.TrackedJoystick;
 
 public class LogitechControlScheme extends ControlScheme {
 
-    private boolean hasChassis;
+ 
+private boolean hasChassis;
         private MecanumChassis chassis;
 
     private boolean hasHatchMechanism;
@@ -20,11 +22,12 @@ public class LogitechControlScheme extends ControlScheme {
     private TrackedJoystick logitech;
 
     private static final int JOYSTICK_ONE_PORT = 0;
+    private static double deadZone = 0.05;
 
     public LogitechControlScheme(MecanumChassis chassis, HatchMechanism hatchMechanism,
         CargoSystem cargoSystem) {
         super();
-        addJoystick(JOYSTICK_ONE_PORT, new int[]{}, new int[]{});
+        addJoystick(JOYSTICK_ONE_PORT, new int[]{}, new int[]{LOGITECH_RIGHT_BUMPER});
 
         logitech = trackedJoysticks.get(0);
 
@@ -40,10 +43,6 @@ public class LogitechControlScheme extends ControlScheme {
 
     @Override
     public void controlRobot() {
-        for(TrackedJoystick joystick : trackedJoysticks) {
-            joystick.update();
-        }
-
         controlChassis();
         controlHatchMechanism();
         controlCargoSystem();
@@ -56,6 +55,7 @@ public class LogitechControlScheme extends ControlScheme {
 
     private void controlHatchMechanism() {
         if(!hasHatchMechanism) return;
+        // if(logitech.buttonWasJustPressed(LOGITECH_RIGHT_BUMPER)) hatchMechanism.toggle();
         if(logitech.getRawButton(LOGITECH_RIGHT_BUMPER)) hatchMechanism.deploy();
         else hatchMechanism.retract();
     }
@@ -63,14 +63,26 @@ public class LogitechControlScheme extends ControlScheme {
     private void controlCargoSystem() {
         if(!hasCargoSystem) return;
 
-        double forwardPower = logitech.getRawAxis(LOGITECH_LEFT_TRIGGER),
-            backwardPower = logitech.getRawAxis(LOGITECH_RIGHT_TRIGGER);
+        double leftPower = logitech.getRawAxis(LOGITECH_LEFT_TRIGGER),
+            rightPower = logitech.getRawAxis(LOGITECH_RIGHT_TRIGGER);
 
-        double truePower = (Math.abs(forwardPower) > Math.abs(backwardPower)) ? forwardPower : -backwardPower;
-
-        cargoSystem.setIntake(truePower);
-        cargoSystem.setConveyorBelt(truePower);
-        cargoSystem.setCargoOutput(-truePower);
+        if(leftPower > deadZone && rightPower > deadZone) {
+            double averagePower = (leftPower + rightPower) / 2;
+            cargoSystem.setIntake(-averagePower);
+            cargoSystem.setConveyorBelt(-averagePower);
+            cargoSystem.setCargoOutput(-averagePower);
+        } else if(leftPower > deadZone) {
+            cargoSystem.setIntake(leftPower);
+            cargoSystem.setConveyorBelt(leftPower);
+            cargoSystem.setCargoOutput(0);
+        } else if(rightPower > deadZone) {
+            cargoSystem.setIntake(0);
+            cargoSystem.setConveyorBelt(0);
+            cargoSystem.setCargoOutput(rightPower);
+        } else {
+            cargoSystem.stop();
+        }
+        
     }
 
 }

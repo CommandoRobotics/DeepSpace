@@ -20,7 +20,7 @@ public class Robot extends TimedRobot {
   private int currentState;
   private static final int DRIVER_CONTROL_STATE = 0;
   private static final int COLOR_ALIGN_STATE = 1;
-
+  
   private UsbCamera camera;
 
   private MecanumChassis chassis;
@@ -36,7 +36,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     this.currentState = DRIVER_CONTROL_STATE;
-
     camera = CameraServer.getInstance().startAutomaticCapture(0);
 
     background = true;
@@ -48,7 +47,7 @@ public class Robot extends TimedRobot {
 
     this.controlScheme = new LogitechControlScheme(chassis, hatchMechanism, cargoSystem);//9,8,7,6
 
-    this.communications = new Communications(new int[]{0, 1}, new int[]{}, new int[]{0, 1, 2}, new int[]{3});
+    this.communications = new Communications(new int[]{0, 1}, new int[]{}, new int[]{1, 2}, new int[]{3});
   }
 
   @Override
@@ -68,7 +67,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    SmartDashboard.putBoolean(" ", (background = !background));
+    // SmartDashboard.putBoolean(" ", (background = !background));
+    
    
     System.out.println();
 

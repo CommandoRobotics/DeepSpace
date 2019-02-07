@@ -22,8 +22,8 @@ public abstract class ControlScheme {
     protected static final int LOGITECH_BOTTOM_BUTTON = 1;
     protected static final int LOGITECH_LEFT_BUTTON = 3;
     protected static final int LOGITECH_RIGHT_BUTTON = 2;
-    protected static final int LOGITECH_LEFT_BUMPER = 7;
-    protected static final int LOGITECH_RIGHT_BUMPER = 8;
+    protected static final int LOGITECH_LEFT_BUMPER = 5;
+    protected static final int LOGITECH_RIGHT_BUMPER = 6;
 
     //JOYSTICKS
     //These joysticks are tracked for if they are receiving input and which input have just been activated (for toggling)
