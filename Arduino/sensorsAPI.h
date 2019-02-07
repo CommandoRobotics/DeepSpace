@@ -3,13 +3,16 @@
 
 #ifndef SENSORS_API
 #define SENSORS_API
-int trigPin = 11;    // Trigger
-int echoPin = 12;    // Echo
+int trigPinLeft = 11;    // Trigger
+int echoPinLeft = 12;    // Echo
+int trigPinRight = 9;    // Trigger
+int echoPinRight = 10;    // Echo
 long duration, cm, inches;
 
 void setupAPI(){
  setupLimitSwitch();
  setupTouchlessEncoder();
+ setupElegooUltrasonicSensor();
 }
 
 //Returns the distance in centimeters
@@ -47,23 +50,33 @@ bool encoderSeesMark(){
   return false;
   }
 
-Void setupElegooUltrasonicSensor(){
+void setupElegooUltrasonicSensor(){
   Serial.begin (9600);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
 }
 
-long getDistanceUsingElegooUltrasonic(){
-  digitalWrite(trigPin, LOW);
+long ultrasonicLeft(){
+  digitalWrite(trigPinLeft, LOW);
   delayMicroseconds(5);
-  digitalWrite(trigPin, HIGH);
+  digitalWrite(trigPinLeft, HIGH);
   delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  pinMode(echoPin, INPUT);
-  duration = pulseIn(echoPin, HIGH);
-  cm = (duration/2) / 29.1;     // Divide by 29.1 or multiply by 0.0343
+  digitalWrite(trigPinLeft, LOW);
+  pinMode(echoPinleft, INPUT);
+  duration = pulseIn(echoPinLeft, HIGH);
   inches = (duration/2) / 74;   // Divide by 74 or multiply by 0.0135
-  return cm;
+  return in;
+}
+
+long ultrasonicRight(){
+  digitalWrite(trigPinRight, LOW);
+  delayMicroseconds(5);
+  digitalWrite(trigPinRight, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPinRight, LOW);
+  pinMode(echoPinRight, INPUT);
+  duration = pulseIn(echoPinRight, HIGH);
+  inches = (duration/2) / 74;   // Divide by 74 or multiply by 0.0135
   return in;
 }
 
