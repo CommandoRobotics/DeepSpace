@@ -6,53 +6,30 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class CargoIntake {
 
     //INTAKE MOTORS
-    private Spark[] motors;
+    private Spark motor;
 
     //LIMIT SWITCH--If this triggeres, then we have a cargo in the robot
     private DigitalInput limitSwitch;
-
-    private int intakeState;
-    public static final int INTAKE_INACTIVE = 0;
-    public static final int INTAKE_PULLING = 1;
-    public static final int INTAKE_PUSHING = 2;
 
     //Minimum power at which the motors will turn
     private double minimumPower;
 
     //TODO: Change this to an absolute number of motor ports
-    public CargoIntake(int limitSwitchPort, int... motorPorts) {
-        this.limitSwitch = new DigitalInput(limitSwitchPort);
+    public CargoIntake(int motorPort, int limitSwitchPort) {
+        this(new Spark(motorPort), new DigitalInput(limitSwitchPort));
+    }
 
-        motors = new Spark[motorPorts.length];
-        for(int i = 0; i < motorPorts.length; i++) {
-            this.motors[i] = new Spark(motorPorts[i]);
-        }
-
+    public CargoIntake(Spark motor, DigitalInput limitSwitch) {
+        this.motor = motor;
+        this.limitSwitch = limitSwitch;
         this.minimumPower = 0.05;
     }
 
-    public CargoIntake(DigitalInput limitSwitch, Spark... motors) {
-        this.motors = motors;
-        this.limitSwitch = limitSwitch;
-    }
-
-    public void update(double power) {
+    public void update() {
         if(limitSwitch.get()) {
             //If the limit switch is active, we have cargo loaded. We can stop spinning the wheels.
-            stopIntake();
-        }
-
-        switch(intakeState) {
-            case INTAKE_PULLING:
-                pullCargo(power);
-                break;
-            case INTAKE_PUSHING:
-                pushCargo(power);
-                break;
-            default:
-                stopIntake();
-                break;
-        }
+            stop();
+        } 
     }
 
     public double getMinimumPower() {
@@ -65,29 +42,15 @@ public class CargoIntake {
 
     public void pullCargo(double power) {
         double truePower = (Math.abs(power) > minimumPower) ? power : minimumPower;
-        for(Spark spark : motors) {
-            spark.set(Math.abs(truePower));
-        }
-        intakeState = INTAKE_PULLING;
+        motor.set(Math.abs(truePower));
     }
 
     public void pushCargo(double power) {
-        double truePower = (Math.abs(power) > minimumPower) ? power : minimumPower;
-        for(Spark spark : motors) {
-            spark.set(-Math.abs(truePower));
-        }
-        intakeState = INTAKE_PUSHING;
+        double truePower = (Math.abs(power) > minimumPower) ? power : -minimumPower;
+        motor.set(-Math.abs(truePower));
     }
 
-    public void stopIntake() {
-        for(Spark spark : motors) {
-            spark.set(0);
-        }
-        intakeState = INTAKE_INACTIVE;
+    public void stop() {
+        motor.set(0);
     }
-
-    public boolean intakeIsActive() {
-        return intakeState != INTAKE_INACTIVE;
-    }
-
 }
