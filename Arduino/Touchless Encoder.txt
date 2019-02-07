@@ -1,0 +1,12 @@
+//touchless encoder
+//commando robotics 2019
+
+#ifndef SENSORS_API
+#define SENSORS_API
+
+Bool encoderSeesMark(){
+  if( digitalRead(6) == LOW ){
+  return true;
+  }else{
+  return false;
+}
