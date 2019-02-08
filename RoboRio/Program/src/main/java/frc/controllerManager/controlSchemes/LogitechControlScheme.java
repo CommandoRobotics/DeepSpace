@@ -1,92 +1,78 @@
 package frc.controllerManager.controlSchemes;
-
+	
+import frc.apis.Communications;
 import frc.apis.MecanumChassis;
-import edu.wpi.first.wpilibj.Timer;
-import frc.apis.CargoSystem;
-import frc.apis.HatchMechanism;
-import frc.controllerManager.ControlScheme;
-import frc.controllerManager.TrackedJoystick;
 
-public class LogitechControlScheme extends ControlScheme {
+public class DriverAssistControlScheme extends ControlScheme {
 
- 
-private boolean hasChassis;
-        private MecanumChassis chassis;
+	private static final int ANALOG_MEDIAN_VOLTAGE = 2.5;
+	private static final int ANALOG_DEADZONE = 0.25;
+	private static final int MINIMUM_ANALOG = 0.05;
+	
+	private boolean finished;
+	private boolean canShoot;
 
-    private boolean hasHatchMechanism;
-        private HatchMechanism hatchMechanism;
-    
-    private boolean hasCargoSystem;
-        private CargoSystem cargoSystem;
+	private Communications communications;
 
-    private TrackedJoystick logitech;
+	//TODO: Set all of these ports to what they should be
+	private static final int STRAFE_ANALOG_PORT = 1;
+	private static final int DRIVE_FORWARD_ANALOG_PORT = 0;
+	private static final int ROTATE_ANALOG_PORT = 2;
+	private static final int DRIVER_ASSIST_CAN_BEGIN_PORT = 1;
+	private static final int DRIVER_ASSIST_FINISHED_DIGITAL_PORT = 2;
+	private static final int CAN_SHOOT_DIGITAL_PORT = 3;
 
-    private static final int JOYSTICK_ONE_PORT = 0;
-    private static double deadZone = 0.05;
+	private boolean hasChassis = false;
+		private MecanumChassis chassis;
 
-    public LogitechControlScheme(MecanumChassis chassis, HatchMechanism hatchMechanism,
-        CargoSystem cargoSystem) {
-        super();
-        addJoystick(JOYSTICK_ONE_PORT, new int[]{}, new int[]{LOGITECH_RIGHT_BUMPER});
+	public DriverAssistAPI(Communications communications, MecanumChassis chassis) {
+		this.communications = communications;
 
-        logitech = trackedJoysticks.get(0);
+		this.chassis = chassis;
+		this.hasChassis = this.chassis != null;
+		
+		this.finished = false;
+		this.canShoot = false;
+	}
 
-        this.chassis = chassis;
-        this.hasChassis = this.chassis != null;
+	public void start() {
+		//If we are being told that the driver assist program cannot begin, then we want to immediately declare the program to be finished running.
+		finished = !canBegin();
+		canShoot = false;
+	}
 
-        this.hatchMechanism = hatchMechanism;
-        this.hasHatchMechanism = this.hatchMechanism != null;
+	public void controlRobot() {
+		//If we are done, then do NOT check the input ports for controls
+		if(finished) return;
+		chassis.driveMecanum(
+		scaleAnalogInput(communications.getAnalogPortInput(DRIVE_FORWARD_ANALOG_PORT)),
+		scaleAnalogInput(communications.getAnalogPortInput(STRAFE_ANALOG_PORT)),
+		scaleAnalogInput(communications.getAnalogPortInput(ROTATE_ANALOG_PORT)));
 
-        this.cargoSystem = cargoSystem;
-        this.hasCargoSystem = this.cargoSystem != null;
-    }
+		if(communications.getDigitalPortInput(DRIVER_ASSIST_FINISHED_DIGITAL_PORT)) {
+			finished = true;
+			canShoot = communications.getDigitalPortInput(CAN_SHOOT_DIGITAL_PORT);
+		}
+	}
 
-    @Override
-    public void controlRobot() {
-        controlChassis();
-        controlHatchMechanism();
-        controlCargoSystem();
-    }
+	private double scaleAnalogInput(double input) {
+		//Prevents negative values from being passed as parameters.
+		//Also catches the potential edge case that would cause an absence of a signal to send the robot shooting off in one direction.
+		 if(input < MINIMUM_ANALOG) return 0;
+		if(Math.abs(input - ANALOG_MEDIAN_VOLTAGE) < ANALOG_DEADZONE) return 0;
 
-    private void controlChassis() {
-        if(!hasChassis) return;
-        chassis.driveMecanum(logitech.getRawAxis(LOGITECH_X_AXIS_1), -logitech.getRawAxis(LOGITECH_Y_AXIS_1), logitech.getRawAxis(LOGITECH_X_AXIS_2));
-    }
+		return (input - ANALOG_MEDIAN_VOLTAGE) / ANALOG_MEDIAN_VOLTAGE;
+	}
+	
+	public boolean canBegin() {
+		return communications.getDigitalPortInput(DRIVER_ASSIST_CAN_BEGIN_PORT);
+	}
 
-    private void controlHatchMechanism() {
-        if(!hasHatchMechanism) return;
-        // if(logitech.buttonWasJustPressed(LOGITECH_RIGHT_BUMPER)) hatchMechanism.toggle();
-        if(logitech.getRawButton(LOGITECH_RIGHT_BUMPER)) hatchMechanism.deploy();
-        else hatchMechanism.retract();
-    }
+	public boolean isFinished() {
+		return finished;
+	}
 
-    private void controlCargoSystem() {
-        if(!hasCargoSystem) return;
-
-        double leftPower = logitech.getRawAxis(LOGITECH_LEFT_TRIGGER),
-            rightPower = logitech.getRawAxis(LOGITECH_RIGHT_TRIGGER);
-
-        if(leftPower > deadZone && rightPower > deadZone) {
-            double averagePower = (leftPower + rightPower) / 2;
-            cargoSystem.setIntake(-averagePower);
-            cargoSystem.setConveyorBelt(-averagePower);
-            cargoSystem.setCargoOutput(-averagePower);
-        } else if(leftPower > deadZone) {
-            cargoSystem.setIntake(leftPower);
-            cargoSystem.setConveyorBelt(leftPower);
-            cargoSystem.setCargoOutput(0);
-        } else if(rightPower > deadZone) {
-            cargoSystem.setIntake(0);
-            cargoSystem.setConveyorBelt(0);
-            cargoSystem.setCargoOutput(rightPower);
-        } else {
-            cargoSystem.stop();
-        }
-        
-    }
- 
-    public boolean driverAssistRequested() {
-      return logitech.getRawButton(LOGITECH_BOTTOM_BUTTON);
-    }
-
+	public boolean getCanShoot() {
+		return canShoot;
+	}
 }
