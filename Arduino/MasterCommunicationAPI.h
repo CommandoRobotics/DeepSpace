@@ -22,7 +22,7 @@ int getData(int index) {
   return 0;
 }
 
-float getVisionPixyFloat() {
+float getVisionPixyDistance() {
   requestData(8, MAX_BYTES);
   float f;
   uchar b[] = {getData(5), getData(4), getData(3), getData(2)};
