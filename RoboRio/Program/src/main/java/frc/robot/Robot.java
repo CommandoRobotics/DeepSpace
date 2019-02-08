@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   private int currentState;
   private static final int DRIVER_CONTROL_STATE = 0;
-  private static final int COLOR_ALIGN_STATE = 1;
+  private static final int DRIVER_ASSIST_STATE = 1;
   
   private UsbCamera camera;
 
@@ -28,6 +28,7 @@ public class Robot extends TimedRobot {
   private CargoSystem cargoSystem;
 
   private LogitechControlScheme controlScheme;
+  private DriverAssistControlScheme driverAssist;
 
   private Communications communications;
 
@@ -45,9 +46,10 @@ public class Robot extends TimedRobot {
     this.hatchMechanism = new HatchMechanism(0, 1);
     this.cargoSystem = new CargoSystem(new CargoIntake(4, 0), new CargoConveyorBelt(7), new CargoOutput(5, 6));
 
+	  this.communications = new Communications(new int[]{0, 1}, new int[]{}, new int[]{1, 2}, new int[]{3});
+	  
     this.controlScheme = new LogitechControlScheme(chassis, hatchMechanism, cargoSystem);//9,8,7,6
-
-    this.communications = new Communications(new int[]{0, 1}, new int[]{}, new int[]{1, 2}, new int[]{3});
+	this.driverAssist = new DriverAssistControlScheme(communications, chassis);
   }
 
   @Override
@@ -69,14 +71,21 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // SmartDashboard.putBoolean(" ", (background = !background));
     
-   
-    System.out.println();
-
     switch(currentState) {
        case DRIVER_CONTROL_STATE:
-         controlScheme.controlRobot();
+		 if(controlScheme.driverAssistRequested()) {
+			driverAssist.start();
+			currentState = DRIVER_ASSIST_STATE;
+		 } else {
+         	controlScheme.controlRobot();
+		 }
          break;
-       case COLOR_ALIGN_STATE:   
+       case DRIVER_ASSIST_STATE:   
+		 if(driverAssist.isFinished() || controlScheme.driverAssistRequested()) {
+		 	currentState = DRIVER_CONTROL_STATE;
+		 } else {
+			driverAssist.controlRobot();
+		 }
          break;
     }
   }
