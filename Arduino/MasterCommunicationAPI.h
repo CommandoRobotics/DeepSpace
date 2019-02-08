@@ -22,4 +22,17 @@ int getData(int index) {
   return 0;
 }
 
+float getVisionPixyFloat() {
+  requestData(8, MAX_BYTES);
+  float f;
+  uchar b[] = {getData(5), getData(4), getData(3), getData(2)};
+  memcpy(&f, &b, sizeof(f));
+  return f;
+}
+
+bool getVisionActive() {
+  requestData(8, MAX_BYTES);
+  return (int) getData(0) == 1;
+}
+
 #endif
