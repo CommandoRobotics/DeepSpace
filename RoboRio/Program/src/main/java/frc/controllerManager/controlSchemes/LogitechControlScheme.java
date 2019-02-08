@@ -27,7 +27,7 @@ private boolean hasChassis;
     public LogitechControlScheme(MecanumChassis chassis, HatchMechanism hatchMechanism,
         CargoSystem cargoSystem) {
         super();
-        addJoystick(JOYSTICK_ONE_PORT, new int[]{}, new int[]{LOGITECH_RIGHT_BUMPER});
+        addJoystick(JOYSTICK_ONE_PORT, new int[]{}, new int[]{LOGITECH_BOTTOM_BUTTON});
 
         logitech = trackedJoysticks.get(0);
 
@@ -86,7 +86,7 @@ private boolean hasChassis;
     }
  
     public boolean driverAssistRequested() {
-      return logitech.getRawButton(LOGITECH_BOTTOM_BUTTON);
+      return logitech.buttonWasJustPressed(LOGITECH_BOTTOM_BUTTON);
     }
 
 }
