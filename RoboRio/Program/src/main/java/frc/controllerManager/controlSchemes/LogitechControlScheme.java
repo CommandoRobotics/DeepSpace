@@ -84,5 +84,9 @@ private boolean hasChassis;
         }
         
     }
+ 
+    public boolean driverAssistRequested() {
+      return logitech.getRawButton(LOGITECH_BOTTOM_BUTTON);
+    }
 
 }
