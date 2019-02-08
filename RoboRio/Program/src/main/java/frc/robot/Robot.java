@@ -69,7 +69,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    // SmartDashboard.putBoolean(" ", (background = !background));
+    SmartDashboard.putBoolean(" ", driverAssist.canBegin());
     
     switch(currentState) {
        case DRIVER_CONTROL_STATE:
