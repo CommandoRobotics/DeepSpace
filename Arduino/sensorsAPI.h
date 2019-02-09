@@ -7,7 +7,7 @@ int trigPinLeft = 11;    // Trigger
 int echoPinLeft = 12;    // Echo
 int trigPinRight = 9;    // Trigger
 int echoPinRight = 10;    // Echo
-long duration, cm, inches;
+long duration, in;
 
 void setupAPI(){
  setupLimitSwitch();
