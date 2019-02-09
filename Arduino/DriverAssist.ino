@@ -1,44 +1,94 @@
-#include "ultrasonicAPI.h"
+#include "MasterCommunicationAPI.h"
+#include "sensorsAPI.h"
+
+bool trackingLine() {
+  return false;
+}
+
+float lineAngle() {
+  return 0.0;
+}
+
+float lineDistance() {
+  return 100.0;
+}
+
+float lineStrafe() {
+  return 0;
+}
+
+bool trackingTarget(){
+  return false;
+}
+
+float targetAngle(){
+  return 0.0;
+}
+
+float targetDistance(){
+  return 100.0;
+}
+
+float targetStrafe(){
+  return 0;
+}
+
+void commandRio(float angle, float strafe, float distance) {
+  
+}
 
 void setup(){
-  
+  setupElegooUltrasonicSensor();
+  setupCommunications();
 }
 
-void driverAssist(){
 
-  if(/*vision target is more than 1 foot 4 inches away*/ && ultrasonicDistance > 42){
-    if(/*vision target is on the left*/){
-      //tell chassis to move left
-    } else if(/*vision target is on the right*/){
-      //tell chassis to move right
-    } else if(/*vision target is centered*/){
-      //tell chassis to move straight
-    } else {
-      //alert driver of vision tracking failure
+void loop() {
+  float drivePower;
+  float strafePower;
+  float rotatePower;
+  const float maxAllowableAngle = 30;
+  const float maxAllowableDistanceInInches = 60;
+  const float minAllowableDrivePower = 0.1; // Motor will burn up if we drive at less than 10%.
+  float normalizedAnglePercentage;
+
+  if(trackingLine()){
+    if(lineAngle() < (-1 * maxAllowableAngle)){
+      normalizedAnglePercentage = 1;
+    } else if (lineAngle() > maxAllowableAngle) {
+      normalizedAnglePercentage = -1;
+    } else{
+      normalizedAnglePercentage = lineAngle() / maxAllowableAngle;
+    }   
+    rotatePower = normalizedAnglePercentage;
+    
+    strafePower = lineStrafe();
+    drivePower = 1 - (abs(strafePower) + abs(rotatePower));
+    if (drivePower < minAllowableDrivePower) {
+      drivePower = 0;
     }
-  } else if(ultrasonicDistance < 42){
-    if(/*vision target is more than 2 degrees to the left*/){
-      //strafe left slowly
-    } else if(/*vision target is more than 2 degrees to the right*/){
-      //strafe right slowly
-    } else if(/*vision target is between 0 and 1 degrees off*/){
-      if(/*left color sensor detects line*/){
-        //turn to the left a tiny bit
-      } else if(/*right color sensor detects line*/){
-        //turn to the right a tiny bit
-      } else if(/*neither color sensor detects line*/){
-        //drive straight
-      }
+    
+  } else if(trackingTarget()){
+
+    if(targetAngle() < (-1 * maxAllowableAngle)){
+      normalizedAnglePercentage = 1;
+    } else if (targetAngle() > maxAllowableAngle) {
+      normalizedAnglePercentage = -1;
+    } else{
+      normalizedAnglePercentage = targetAngle() / maxAllowableAngle;
     }
-  } else if(/*ultrasonic sensor is less than or equal to 2 inches away*/){
-    //tell rio clear to drop object
+    rotatePower = normalizedAnglePercentage;
+      
+    rotatePower = normalizedAngleAnglePercentage;
+    strafePower = targetStrafe() / 100;
+    drivePower = (1 - (strafePower + rotatePower)) * targetDistance();
+
   } else {
-    //alert driver of line up failure
+    drivePower = 0;
+    strafePower = 0;
+    rotatePower = 0;
+    //unable to do driverAssist
   }
-  
-}
 
-void loop(){
-  double ultrasonicDistance = getDistanceUsingUltrasonic();
-  driverAssist();
+  
 }
