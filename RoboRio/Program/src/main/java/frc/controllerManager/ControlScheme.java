@@ -33,6 +33,12 @@ public abstract class ControlScheme {
         this.trackedJoysticks = new ArrayList<>();
     }
 
+    public void update() {
+        for(TrackedJoystick joystick : trackedJoysticks) {
+            joystick.update();
+        }
+    }
+
     public void addJoystick(int port, int[] axesToTrack, int[] buttonsToTrack) {
         TrackedJoystick trackedJoystick = new TrackedJoystick(port);
         trackedJoystick.trackAxes(axesToTrack);

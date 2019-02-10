@@ -15,6 +15,7 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class Robot extends TimedRobot {
   private int currentState;
@@ -31,7 +32,7 @@ public class Robot extends TimedRobot {
   private DriverAssistControlScheme driverAssist;
 
   private Communications communications;
-  private static fianl int WHICH_ALLIANCE_DIGITAL_PORT = 5;
+  private static final int WHICH_ALLIANCE_DIGITAL_PORT = 5;
 
   private boolean onBlueAlliance;
   private boolean background;
@@ -58,7 +59,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-	onBlueAlliance = (DriverStation.getInstance().getAlliance() == DriverStation.Alliance.kBlue);
+	onBlueAlliance = (DriverStation.getInstance().getAlliance() == DriverStation.Alliance.Blue);
 	communications.sendDigitalPortOutput(WHICH_ALLIANCE_DIGITAL_PORT, onBlueAlliance);
   }
 
@@ -76,22 +77,26 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     SmartDashboard.putBoolean(" ", driverAssist.canBegin());
     
+    controlScheme.update();
+
     switch(currentState) {
-       case DRIVER_CONTROL_STATE:
-		 if(controlScheme.driverAssistRequested()) {
-			driverAssist.start();
-			currentState = DRIVER_ASSIST_STATE;
-		 } else {
-         	controlScheme.controlRobot();
-		 }
-         break;
-       case DRIVER_ASSIST_STATE:   
-		 if(driverAssist.isFinished() || controlScheme.driverAssistRequested()) {
-		 	currentState = DRIVER_CONTROL_STATE;
-		 } else {
-			driverAssist.controlRobot();
-		 }
-         break;
+      case DRIVER_CONTROL_STATE:
+        if(controlScheme.driverAssistRequested()) {
+          System.out.println("Driver Assist Requested");
+          driverAssist.start();
+          currentState = DRIVER_ASSIST_STATE;
+        } else {
+          controlScheme.controlRobot();
+        }
+        break;
+      case DRIVER_ASSIST_STATE:   
+        if(driverAssist.isFinished() || controlScheme.driverAssistRequested()) {
+          System.out.println("Driver Assist Stopped");
+          currentState = DRIVER_CONTROL_STATE;
+        } else {
+          driverAssist.controlRobot();
+        }
+        break;
     }
   }
 

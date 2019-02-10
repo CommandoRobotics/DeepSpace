@@ -57,8 +57,10 @@ public class TrackedJoystick extends Joystick {
             boolean buttonPressed = this.getRawButton(buttonToTrack);
             
             if(buttonPressed) receivedInput = true;
+            buttonJustPressed.put(buttonToTrack, !buttonHeld.get(buttonToTrack) && buttonPressed);
             this.buttonHeld.put(buttonToTrack, buttonPressed);
-            buttonJustPressed.put(buttonToTrack, !buttonJustPressed.get(buttonToTrack) && buttonPressed);
+            System.out.println("Button " + buttonToTrack + " just pressed? " + buttonJustPressed.get(buttonToTrack));
+            
         }
     }
 
@@ -95,6 +97,7 @@ public class TrackedJoystick extends Joystick {
             this.buttonsToTrack.add(buttonToTrack);
             this.buttonJustPressed.put(buttonToTrack, false);
             this.buttonHeld.put(buttonToTrack, false);
+            System.out.println("Now tracking button " + buttonToTrack);
         }
     }
 

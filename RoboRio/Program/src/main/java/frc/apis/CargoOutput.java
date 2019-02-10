@@ -2,7 +2,6 @@ package frc.apis;
 
 import edu.wpi.first.wpilibj.Spark;
 
-//Proper Name: GoGoCargo
 public class CargoOutput {
 
     private Spark leftSpark, rightSpark;

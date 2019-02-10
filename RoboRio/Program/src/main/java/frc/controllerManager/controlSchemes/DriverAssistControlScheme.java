@@ -1,13 +1,14 @@
 package frc.controllerManager.controlSchemes;
 	
+import frc.controllerManager.ControlScheme;
 import frc.apis.Communications;
 import frc.apis.MecanumChassis;
 
 public class DriverAssistControlScheme extends ControlScheme {
 
-	private static final int ANALOG_MEDIAN_VOLTAGE = 2.5;
-	private static final int ANALOG_DEADZONE = 0.25;
-	private static final int MINIMUM_ANALOG = 0.05;
+	private static final double ANALOG_MEDIAN_VOLTAGE = 2.5;
+	private static final double ANALOG_DEADZONE = 0.25;
+	private static final double MINIMUM_ANALOG = 0.05;
 	
 	private boolean finished;
 	private boolean canShoot;
@@ -25,7 +26,7 @@ public class DriverAssistControlScheme extends ControlScheme {
 	private boolean hasChassis = false;
 		private MecanumChassis chassis;
 
-	public DriverAssistAPI(Communications communications, MecanumChassis chassis) {
+	public DriverAssistControlScheme(Communications communications, MecanumChassis chassis) {
 		this.communications = communications;
 
 		this.chassis = chassis;
@@ -36,19 +37,25 @@ public class DriverAssistControlScheme extends ControlScheme {
 	}
 
 	public void start() {
+		System.out.println("Starting Driver Assist");
 		//If we are being told that the driver assist program cannot begin, then we want to immediately declare the program to be finished running.
-		finished = !communications.getDigitalPortInput(DRIVER_ASSIST_CAN_BEGIN_PORT);
+		finished = !canBegin();
 		canShoot = false;
+		System.out.println("Can we start? " + !finished);
 	}
 
-	public void update() {
+	public void controlRobot() {
 		//If we are done, then do NOT check the input ports for controls
-		if(finished) return;
+		if(finished) {
+			chassis.stop();
+			return;
+		}
 		chassis.driveMecanum(
-		scaleAnalogInput(communications.getAnalogPortInput(DRIVE_FORWARD_ANALOG_PORT)),
-		scaleAnalogInput(communications.getAnalogPortInput(STRAFE_ANALOG_PORT)),
-		scaleAnalogInput(communications.getAnalogPortInput(ROTATE_ANALOG_PORT)));
+			scaleAnalogInput(communications.getAnalogPortInput(DRIVE_FORWARD_ANALOG_PORT)),
+			scaleAnalogInput(communications.getAnalogPortInput(STRAFE_ANALOG_PORT)),
+			scaleAnalogInput(communications.getAnalogPortInput(ROTATE_ANALOG_PORT)));
 
+		System.out.println("Finished port input" + communications.getDigitalPortInput(DRIVER_ASSIST_FINISHED_DIGITAL_PORT));
 		if(communications.getDigitalPortInput(DRIVER_ASSIST_FINISHED_DIGITAL_PORT)) {
 			finished = true;
 			canShoot = communications.getDigitalPortInput(CAN_SHOOT_DIGITAL_PORT);
@@ -62,6 +69,10 @@ public class DriverAssistControlScheme extends ControlScheme {
 		if(Math.abs(input - ANALOG_MEDIAN_VOLTAGE) < ANALOG_DEADZONE) return 0;
 
 		return (input - ANALOG_MEDIAN_VOLTAGE) / ANALOG_MEDIAN_VOLTAGE;
+	}
+
+	public boolean canBegin() {
+		return communications.getDigitalPortInput(DRIVER_ASSIST_CAN_BEGIN_PORT);
 	}
 
 	public boolean isFinished() {
