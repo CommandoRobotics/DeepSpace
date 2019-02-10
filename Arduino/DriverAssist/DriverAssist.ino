@@ -6,6 +6,7 @@ masterCommunicationToSlave targetSlave(2);
 masterCommunicationToSlave lineSlave(3);
 
 bool trackingLine() {
+  lineSlave.canSlaveBeTrusted();
   return false;
 }
 
@@ -57,6 +58,9 @@ void loop() {
   const float maxAllowableDistanceInInches = 60;
   const float minAllowableDrivePower = 0.1; // Motor will burn up if we drive at less than 10%.
   float normalizedAnglePercentage;
+
+  targetSlave.update();
+  lineSlave.update();
 
   if(trackingLine()){
     if(lineAngle() < (-1 * maxAllowableAngle)){
