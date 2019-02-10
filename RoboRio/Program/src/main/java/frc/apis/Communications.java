@@ -4,12 +4,15 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Communications {
 
@@ -18,8 +21,15 @@ public class Communications {
     private Map<Integer, AnalogOutput> analogOutputs;
     private Map<Integer, DigitalOutput> digitalOutputs;
 
+    private Map<Integer, SerialPort> serialPorts;
+    private Map<Integer, byte[]> serialData;
+    private static final int SERIAL_BYTE_COUNT = 8;
+
     public Communications(int[] analogInputPorts, int[] analogOutputPorts, int[] digitalInputPorts, int[] digitalOutputPorts) {
         AnalogInput.setGlobalSampleRate(62500);
+
+        serialPorts = new HashMap<>();
+
         analogInputs = new HashMap<>();
         for(int analogInputPort : analogInputPorts) {
             AnalogInput analogInput = new AnalogInput(analogInputPort);
@@ -46,6 +56,9 @@ public class Communications {
     }
 
     public Communications(Collection<Integer> analogInputPorts, Collection<Integer> analogOutputPorts, Collection<Integer> digitalInputPorts, Collection<Integer> digitalOutputPorts) {
+        
+        serialPorts = new HashMap<>();
+        
         analogInputs = new HashMap<>();
         for(int analogInputPort : analogInputPorts) {
             analogInputs.put(analogInputPort, new AnalogInput(analogInputPort));
@@ -68,6 +81,12 @@ public class Communications {
         }
     }
 
+    public void addUSBConnection(int whichPort) {
+        if(whichPort == 0) serialPorts.put(0, new SerialPort(9600, SerialPort.Port.kUSB));
+        if(whichPort == 1) serialPorts.put(1, new SerialPort(9600, SerialPort.Port.kUSB1));
+        if(whichPort == 2) serialPorts.put(2, new SerialPort(9600, SerialPort.Port.kUSB2));
+    }
+
     public void update() {
         Set<Integer> analogInputPorts = analogInputs.keySet();
         for(int analogInputPort : analogInputPorts) {
@@ -77,6 +96,11 @@ public class Communications {
         Set<Integer> digitalInputPorts = digitalInputs.keySet();
         for(int digitalInputPort : digitalInputPorts) {
             SmartDashboard.putBoolean("Digital Input Port " + digitalInputPort, digitalInputs.get(digitalInputPort).get());
+        }
+
+        Set<Integer> serialInputPorts = serialPorts.keySet();
+        for(int serialInputPort : serialInputPorts) {
+            serialData.put(serialInputPort, serialPorts.get(serialInputPort).read(SERIAL_BYTE_COUNT));
         }
     }
 
@@ -96,6 +120,10 @@ public class Communications {
     public void sendDigitalPortOutput(int digitalPort, boolean value) {
         if(digitalOutputs.containsKey(digitalPort))
             digitalOutputs.get(digitalPort).set(value);
+    }
+
+    public byte[] getSerialPortInput(int serialPort) {
+        return serialData.containsKey(serialPort) ? serialData.get(serialPort) : new byte[0];
     }
 
 }
