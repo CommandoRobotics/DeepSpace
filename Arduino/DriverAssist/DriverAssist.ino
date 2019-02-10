@@ -1,5 +1,9 @@
 #include "MasterCommunicationAPI.h"
+#include "masterVisionCommunications.h"
 #include "sensorsAPI.h"
+
+masterCommunicationToSlave targetSlave(2);
+masterCommunicationToSlave lineSlave(3);
 
 bool trackingLine() {
   return false;
@@ -40,6 +44,8 @@ void commandRio(float angle, float strafe, float distance) {
 void setup(){
   setupElegooUltrasonicSensor();
   setupCommunications();
+  targetSlave.setup();
+  lineSlave.setup();
 }
 
 
