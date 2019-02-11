@@ -100,5 +100,8 @@ void loop() {
     //unable to do driverAssist
   }
 
+  Serial.write(drivePower);
+  Serial.write(strafePower);
+  Serial.write(rotatePower);
   
 }
