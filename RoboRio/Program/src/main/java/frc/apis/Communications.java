@@ -25,10 +25,8 @@ public class Communications {
     private Map<Integer, byte[]> serialData;
     private static final int SERIAL_BYTE_COUNT = 8;
 
-    public Communications(int[] analogInputPorts, int[] analogOutputPorts, int[] digitalInputPorts, int[] digitalOutputPorts) {
+    public Communications(int[] analogInputPorts, int[] analogOutputPorts, int[] digitalInputPorts, int[] digitalOutputPorts, int[] serialPorts) {
         AnalogInput.setGlobalSampleRate(62500);
-
-        serialPorts = new HashMap<>();
 
         analogInputs = new HashMap<>();
         for(int analogInputPort : analogInputPorts) {
@@ -53,11 +51,14 @@ public class Communications {
         for(int digitalOutputPort : digitalOutputPorts) {
             digitalOutputs.put(digitalOutputPort, new DigitalOutput(digitalOutputPort));
         }
+
+        this.serialPorts = new HashMap<>();
+        for(int serialPort : serialPorts) {
+            addUSBConnection(serialPort);
+        }
     }
 
-    public Communications(Collection<Integer> analogInputPorts, Collection<Integer> analogOutputPorts, Collection<Integer> digitalInputPorts, Collection<Integer> digitalOutputPorts) {
-        
-        serialPorts = new HashMap<>();
+    public Communications(Collection<Integer> analogInputPorts, Collection<Integer> analogOutputPorts, Collection<Integer> digitalInputPorts, Collection<Integer> digitalOutputPorts, Collection<Integer> serialPorts) {
         
         analogInputs = new HashMap<>();
         for(int analogInputPort : analogInputPorts) {
@@ -78,6 +79,11 @@ public class Communications {
         digitalOutputs = new HashMap<>();
         for(int digitalOutputPort : digitalOutputPorts) {
             digitalOutputs.put(digitalOutputPort, new DigitalOutput(digitalOutputPort));
+        }
+
+        this.serialPorts = new HashMap<>();
+        for(int serialPort : serialPorts) {
+            addUSBConnection(serialPort);
         }
     }
 
@@ -124,6 +130,11 @@ public class Communications {
 
     public byte[] getSerialPortInput(int serialPort) {
         return serialData.containsKey(serialPort) ? serialData.get(serialPort) : new byte[0];
+    }
+
+    public void sendSerialPortOutput(int serialPort, byte[] data) {
+        if(serialPorts.containsKey(serialPort))
+            serialPorts.get(serialPort).write(data, data.length);
     }
 
 }
