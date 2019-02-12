@@ -47,17 +47,17 @@ public:
     }
 
     // Positive if the target is to the robot's right, negative if the target is to the left.
-    float angleInDegreesFromSlave() {
+    double angleInDegreesFromSlave() {
         return slaveInfo.angleInDegrees;
     }
 
     // Distance from our robot to the wall
-    float distanceInInchesFromSlave() {
+    double distanceInInchesFromSlave() {
         return slaveInfo.distanceInInches;
     }
 
     // A relative value from -1.0 (target is way to the robot's left) to +1.0 (target is way to the robot's right)
-    float strafingPercentageFromSlave() {
+    double strafingPercentageFromSlave() {
         return slaveInfo.strafingPercentage;
     }
 };

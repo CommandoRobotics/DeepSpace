@@ -1,9 +1,8 @@
-#include "MasterCommunicationAPI.h"
 #include "masterVisionCommunications.h"
-#include "sensorsAPI.h"
+//#include "sensorsAPI.h"
 
-masterCommunicationToSlave targetSlave(2);
-masterCommunicationToSlave lineSlave(3);
+masterCommunicationToSlave targetSlave(8);
+masterCommunicationToSlave lineSlave(12);
 
 bool trackingLine() {
   lineSlave.canSlaveBeTrusted();
@@ -42,11 +41,11 @@ void commandRio(float angle, float strafe, float distance) {
   
 }
 
-void setup(){
-  setupElegooUltrasonicSensor();
-  setupCommunications();
+void setup() {
+  //setupCommunications();
   targetSlave.setup();
   lineSlave.setup();
+  Serial.begin(9600);
 }
 
 
@@ -89,7 +88,7 @@ void loop() {
     }
     rotatePower = normalizedAnglePercentage;
       
-    rotatePower = normalizedAngleAnglePercentage;
+    rotatePower = normalizedAnglePercentage;
     strafePower = targetStrafe() / 100;
     drivePower = (1 - (strafePower + rotatePower)) * targetDistance();
 
@@ -100,8 +99,23 @@ void loop() {
     //unable to do driverAssist
   }
 
-  Serial.write(drivePower);
-  Serial.write(strafePower);
-  Serial.write(rotatePower);
-  
+  //Serial.write(drivePower);
+  //Serial.write(strafePower);
+  //Serial.write(rotatePower);
+
+  Serial.write("\n");
+  if (lineSlave.canSlaveBeTrusted()) {
+    Serial.write("Good");
+    Serial.print(lineSlave.angleInDegreesFromSlave());
+    Serial.print("° ");
+    Serial.print(lineSlave.distanceInInchesFromSlave());
+    Serial.print("in ");
+    Serial.print(lineSlave.strafingPercentageFromSlave());
+    Serial.print("%\n");
+  } else {
+    Serial.write("Bad");
+  }
+  Serial.write("\n");
+  delay(1000);
+ 
 }
