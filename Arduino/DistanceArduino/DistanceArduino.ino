@@ -107,7 +107,6 @@ void setup() {
   Serial.begin(9600);
   setupVisionCommunications(12);
   setupElegooUltrasonicSensor();
-  Wire.begin(12);
 }
 
 //print
@@ -127,11 +126,12 @@ void loop() {
     Serial.print(getRotationInDegrees());
     Serial.print(" ");
     Serial.print("\n");
-    updateDataForReplyToMaster(trustMe, getRotationInDegrees(), getDistance());
+    updateDataForReplyToMaster(trustMe, getRotationInDegrees(), getDistance(), 0);
   } else {
     trustMe = false;
     Serial.print("bad data");
-    updateDataForReplyToMaster(trustMe, 0, 0);
+    updateDataForReplyToMaster(trustMe, 0, 0, 0);
   }
   Serial.print("\n");
+  //delay(1000);
 }
