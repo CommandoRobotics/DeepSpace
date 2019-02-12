@@ -42,13 +42,28 @@ void commandRio(float angle, float strafe, float distance) {
   
 }
 
+void floatToByteArray(float val, byte* bytes_array){
+  union {
+    float float_variable;
+    byte temp_array[4];
+  } u;
+  u.float_variable = val;
+  memcpy(bytes_array, u.temp_array, 4);
+}
+
 void setup(){
   setupElegooUltrasonicSensor();
   setupCommunications();
   targetSlave.setup();
   lineSlave.setup();
+  Serial.begin(19200);
 }
 
+void sendByteArraySerial(byte bytes_array[], int numberOfBytes){
+  for(int i = 0; i < numberOfBytes; i++) {
+    Serial.print(bytes_array[i]);
+  }
+}
 
 void loop() {
   float drivePower;
@@ -89,16 +104,27 @@ void loop() {
     }
     rotatePower = normalizedAnglePercentage;
       
-    rotatePower = normalizedAngleAnglePercentage;
+    rotatePower = normalizedAnglePercentage;
     strafePower = targetStrafe() / 100;
     drivePower = (1 - (strafePower + rotatePower)) * targetDistance();
 
   } else {
-    drivePower = 0;
-    strafePower = 0;
-    rotatePower = 0;
+    drivePower = 656;
+    strafePower = 54;
+    rotatePower = 4.5;
     //unable to do driverAssist
   }
 
-  
+  byte drivePowerBytes[4], strafePowerBytes[4], rotatePowerBytes[4];
+  floatToByteArray(drivePower, drivePowerBytes);
+  floatToByteArray(strafePower, strafePowerBytes);
+  floatToByteArray(rotatePower, rotatePowerBytes);
+  digitalWrite(LED_BUILTIN,LOW);
+  delay(1000);
+  sendByteArraySerial(drivePowerBytes, 4);
+  digitalWrite(LED_BUILTIN,HIGH);
+  sendByteArraySerial(strafePowerBytes, 4);
+  digitalWrite(LED_BUILTIN,LOW);
+  sendByteArraySerial(rotatePowerBytes, 4);
+  digitalWrite(LED_BUILTIN,HIGH);
 }

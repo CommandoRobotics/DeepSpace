@@ -11,8 +11,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
+
+import java.nio.ByteBuffer;
 
 public class Communications {
 
@@ -53,6 +53,7 @@ public class Communications {
         }
 
         this.serialPorts = new HashMap<>();
+        this.serialData = new HashMap<>();
         for(int serialPort : serialPorts) {
             addUSBConnection(serialPort);
         }
@@ -82,15 +83,16 @@ public class Communications {
         }
 
         this.serialPorts = new HashMap<>();
+        this.serialData = new HashMap<>();
         for(int serialPort : serialPorts) {
             addUSBConnection(serialPort);
         }
     }
 
     public void addUSBConnection(int whichPort) {
-        if(whichPort == 0) serialPorts.put(0, new SerialPort(9600, SerialPort.Port.kUSB));
-        if(whichPort == 1) serialPorts.put(1, new SerialPort(9600, SerialPort.Port.kUSB1));
-        if(whichPort == 2) serialPorts.put(2, new SerialPort(9600, SerialPort.Port.kUSB2));
+        if(whichPort == 0) serialPorts.put(0, new SerialPort(19200, SerialPort.Port.kMXP));
+        if(whichPort == 1) serialPorts.put(1, new SerialPort(19200, SerialPort.Port.kUSB1));
+        if(whichPort == 2) serialPorts.put(2, new SerialPort(19200, SerialPort.Port.kUSB2));
     }
 
     public void update() {
@@ -106,7 +108,8 @@ public class Communications {
 
         Set<Integer> serialInputPorts = serialPorts.keySet();
         for(int serialInputPort : serialInputPorts) {
-            serialData.put(serialInputPort, serialPorts.get(serialInputPort).read(SERIAL_BYTE_COUNT));
+            byte[] data = serialPorts.get(serialInputPort).read(SERIAL_BYTE_COUNT);
+            if(data != null) serialData.put(serialInputPort, data);
         }
     }
 
@@ -130,6 +133,12 @@ public class Communications {
 
     public byte[] getSerialPortInput(int serialPort) {
         return serialData.containsKey(serialPort) ? serialData.get(serialPort) : new byte[0];
+    }
+
+    public float getSerialPortFloat(int serialPort, int startingBit) {
+        if(!serialData.containsKey(serialPort)) return 0f;
+        byte[] input = serialData.get(serialPort);
+        return ByteBuffer.wrap(new byte[]{input[startingBit], input[startingBit + 1], input[startingBit + 2], input[startingBit + 3]}).getFloat();
     }
 
     public void sendSerialPortOutput(int serialPort, byte[] data) {

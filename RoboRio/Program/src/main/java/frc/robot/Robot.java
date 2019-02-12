@@ -22,7 +22,7 @@ public class Robot extends TimedRobot {
   private static final int DRIVER_CONTROL_STATE = 0;
   private static final int DRIVER_ASSIST_STATE = 1;
   
-  private UsbCamera camera;
+  //private UsbCamera camera;
 
   private MecanumChassis chassis;
   private HatchMechanism hatchMechanism;
@@ -33,6 +33,7 @@ public class Robot extends TimedRobot {
 
   private Communications communications;
   private static final int WHICH_ALLIANCE_DIGITAL_PORT = 5;
+  private static final int USB_SERIAL_PORT = 0;
 
   private boolean onBlueAlliance;
   private boolean background;
@@ -40,7 +41,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     this.currentState = DRIVER_CONTROL_STATE;
-    camera = CameraServer.getInstance().startAutomaticCapture(0);
+    //camera = CameraServer.getInstance().startAutomaticCapture(0);
 
     onBlueAlliance = false;
 	  
@@ -51,16 +52,21 @@ public class Robot extends TimedRobot {
     this.hatchMechanism = new HatchMechanism(0, 1);
     this.cargoSystem = new CargoSystem(new CargoIntake(4, 0), new CargoConveyorBelt(7), new CargoOutput(5, 6));
 
-	  this.communications = new Communications(new int[]{0, 1}, new int[]{}, new int[]{1, 2}, new int[]{3, WHICH_ALLIANCE_DIGITAL_PORT});
-	  
+    this.communications = new Communications(
+      new int[]{0, 1},
+      new int[]{},
+      new int[]{1, 2},
+      new int[]{3, WHICH_ALLIANCE_DIGITAL_PORT},
+      new int[]{USB_SERIAL_PORT});
+    
     this.controlScheme = new LogitechControlScheme(chassis, hatchMechanism, cargoSystem);//9,8,7,6
-	this.driverAssist = new DriverAssistControlScheme(communications, chassis);
+	  this.driverAssist = new DriverAssistControlScheme(communications, chassis);
   }
 
   @Override
   public void robotPeriodic() {
-	onBlueAlliance = (DriverStation.getInstance().getAlliance() == DriverStation.Alliance.Blue);
-	communications.sendDigitalPortOutput(WHICH_ALLIANCE_DIGITAL_PORT, onBlueAlliance);
+    onBlueAlliance = (DriverStation.getInstance().getAlliance() == DriverStation.Alliance.Blue);
+    communications.sendDigitalPortOutput(WHICH_ALLIANCE_DIGITAL_PORT, onBlueAlliance);
   }
 
   @Override
@@ -78,6 +84,15 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean(" ", driverAssist.canBegin());
     
     controlScheme.update();
+
+    float drivePower = communications.getSerialPortFloat(USB_SERIAL_PORT, 0);
+		float strafePower = communications.getSerialPortFloat(USB_SERIAL_PORT, 4);
+    float rotationPower = communications.getSerialPortFloat(USB_SERIAL_PORT, 8);
+    
+    /*if(drivePower != 0 || strafePower != 0 || rotationPower != 0)
+      System.out.println("Serial Input: " + drivePower + " " + strafePower + " " + rotationPower);*/
+
+    
 
     switch(currentState) {
       case DRIVER_CONTROL_STATE:

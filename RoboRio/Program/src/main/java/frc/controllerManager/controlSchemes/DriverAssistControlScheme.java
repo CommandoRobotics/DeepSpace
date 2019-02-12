@@ -50,10 +50,15 @@ public class DriverAssistControlScheme extends ControlScheme {
 			chassis.stop();
 			return;
 		}
+		
+		/*
 		chassis.driveMecanum(
 			scaleAnalogInput(communications.getAnalogPortInput(DRIVE_FORWARD_ANALOG_PORT)),
 			scaleAnalogInput(communications.getAnalogPortInput(STRAFE_ANALOG_PORT)),
 			scaleAnalogInput(communications.getAnalogPortInput(ROTATE_ANALOG_PORT)));
+			*/
+		
+		// chassis.driveMecanum(strafePower, drivePower, rotationPower);
 
 		System.out.println("Finished port input" + communications.getDigitalPortInput(DRIVER_ASSIST_FINISHED_DIGITAL_PORT));
 		if(communications.getDigitalPortInput(DRIVER_ASSIST_FINISHED_DIGITAL_PORT)) {
