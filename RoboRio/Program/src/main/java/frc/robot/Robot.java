@@ -51,7 +51,12 @@ public class Robot extends TimedRobot {
     this.hatchMechanism = new HatchMechanism(0, 1);
     this.cargoSystem = new CargoSystem(new CargoIntake(4, 0), new CargoConveyorBelt(7), new CargoOutput(5, 6));
 
-	  this.communications = new Communications(new int[]{0, 1}, new int[]{}, new int[]{1, 2}, new int[]{3, WHICH_ALLIANCE_DIGITAL_PORT});
+    this.communications = new Communications(
+      new int[]{0, 1},
+      new int[]{},
+      new int[]{1, 2},
+      new int[]{3, WHICH_ALLIANCE_DIGITAL_PORT},
+      new int[]{0});
 	  
     this.controlScheme = new LogitechControlScheme(chassis, hatchMechanism, cargoSystem);//9,8,7,6
 	this.driverAssist = new DriverAssistControlScheme(communications, chassis);
@@ -59,8 +64,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-	onBlueAlliance = (DriverStation.getInstance().getAlliance() == DriverStation.Alliance.Blue);
-	communications.sendDigitalPortOutput(WHICH_ALLIANCE_DIGITAL_PORT, onBlueAlliance);
+    onBlueAlliance = (DriverStation.getInstance().getAlliance() == DriverStation.Alliance.Blue);
+    communications.sendDigitalPortOutput(WHICH_ALLIANCE_DIGITAL_PORT, onBlueAlliance);
   }
 
   @Override
@@ -102,5 +107,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
+
   }
 }

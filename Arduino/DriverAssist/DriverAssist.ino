@@ -104,11 +104,13 @@ void loop() {
     strafePower = targetStrafe() / 100;
     drivePower = (1 - (abs(strafePower) + abs(rotatePower))) * targetDistance();
     autoPilotAvailable = true;
+    Serial.print("Tracking target");
   } else {
     drivePower = 0;
     strafePower = 0;
     rotatePower = 0;
     autoPilotAvailable = false;
+    Serial.print("Unable to perform driver assist");
     //unable to do driverAssist
   }
 

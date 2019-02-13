@@ -23,7 +23,7 @@ public class Communications {
 
     private Map<Integer, SerialPort> serialPorts;
     private Map<Integer, byte[]> serialData;
-    private static final int SERIAL_BYTE_COUNT = 8;
+    private static final int SERIAL_BYTE_COUNT = 16;
 
     public Communications(int[] analogInputPorts, int[] analogOutputPorts, int[] digitalInputPorts, int[] digitalOutputPorts, int[] serialPorts) {
         AnalogInput.setGlobalSampleRate(62500);
@@ -88,7 +88,7 @@ public class Communications {
     }
 
     public void addUSBConnection(int whichPort) {
-        if(whichPort == 0) serialPorts.put(0, new SerialPort(9600, SerialPort.Port.kUSB));
+        if(whichPort == 0) serialPorts.put(0, new SerialPort(9600, SerialPort.Port.kMXP));
         if(whichPort == 1) serialPorts.put(1, new SerialPort(9600, SerialPort.Port.kUSB1));
         if(whichPort == 2) serialPorts.put(2, new SerialPort(9600, SerialPort.Port.kUSB2));
     }
@@ -106,7 +106,11 @@ public class Communications {
 
         Set<Integer> serialInputPorts = serialPorts.keySet();
         for(int serialInputPort : serialInputPorts) {
-            serialData.put(serialInputPort, serialPorts.get(serialInputPort).read(SERIAL_BYTE_COUNT));
+            byte[] serialInput = serialPorts.get(serialInputPort).read(SERIAL_BYTE_COUNT);
+            for(byte character : serialInput) {
+                
+            }
+            serialData.put(serialInputPort, );
         }
     }
 
