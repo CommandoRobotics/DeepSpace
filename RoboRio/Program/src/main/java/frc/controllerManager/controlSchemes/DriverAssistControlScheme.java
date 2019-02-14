@@ -3,6 +3,7 @@ package frc.controllerManager.controlSchemes;
 import frc.controllerManager.ControlScheme;
 import frc.apis.Communications;
 import frc.apis.MecanumChassis;
+import frc.apis.SerialData;
 
 public class DriverAssistControlScheme extends ControlScheme {
 
@@ -22,6 +23,7 @@ public class DriverAssistControlScheme extends ControlScheme {
 	private static final int DRIVER_ASSIST_CAN_BEGIN_PORT = 1;
 	private static final int DRIVER_ASSIST_FINISHED_DIGITAL_PORT = 2;
 	private static final int CAN_SHOOT_DIGITAL_PORT = 3;
+	private static final int SERIAL_PORT = 0;
 
 	private boolean hasChassis = false;
 		private MecanumChassis chassis;
@@ -50,6 +52,20 @@ public class DriverAssistControlScheme extends ControlScheme {
 			chassis.stop();
 			return;
 		}
+
+		SerialData serialData = communications.getSerialData(SERIAL_PORT);
+		if(serialData.dataGood()) {
+			double strafePower = SerialData.parsePercentage(serialData, 'x');
+			double drivePower = SerialData.parsePercentage(serialData, 'z');
+			double rotatePower = SerialData.parsePercentage(serialData, 'y');
+
+			chassis.driveMecanum(strafePower, drivePower, rotatePower);
+		} else {
+			chassis.stop();
+			finished = true;
+		}
+
+		/*
 		chassis.driveMecanum(
 			scaleAnalogInput(communications.getAnalogPortInput(DRIVE_FORWARD_ANALOG_PORT)),
 			scaleAnalogInput(communications.getAnalogPortInput(STRAFE_ANALOG_PORT)),
@@ -60,6 +76,7 @@ public class DriverAssistControlScheme extends ControlScheme {
 			finished = true;
 			canShoot = communications.getDigitalPortInput(CAN_SHOOT_DIGITAL_PORT);
 		}
+		*/
 	}
 
 	private double scaleAnalogInput(double input) {

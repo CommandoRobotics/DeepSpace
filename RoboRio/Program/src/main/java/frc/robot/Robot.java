@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
       new int[]{0});
 	  
     this.controlScheme = new LogitechControlScheme(chassis, hatchMechanism, cargoSystem);//9,8,7,6
-	this.driverAssist = new DriverAssistControlScheme(communications, chassis);
+	  this.driverAssist = new DriverAssistControlScheme(communications, chassis);
   }
 
   @Override
@@ -79,9 +79,16 @@ public class Robot extends TimedRobot {
   }
 
   @Override
+  public void teleopInit() {
+    this.currentState = DRIVER_CONTROL_STATE;
+  }
+
+  @Override
   public void teleopPeriodic() {
     SmartDashboard.putBoolean(" ", driverAssist.canBegin());
-    
+
+    communications.update();
+
     controlScheme.update();
 
     switch(currentState) {

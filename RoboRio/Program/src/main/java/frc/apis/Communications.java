@@ -1,5 +1,7 @@
 package frc.apis;
 
+import frc.apis.SerialData;
+
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -11,8 +13,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
 
 public class Communications {
 
@@ -22,7 +22,7 @@ public class Communications {
     private Map<Integer, DigitalOutput> digitalOutputs;
 
     private Map<Integer, SerialPort> serialPorts;
-    private Map<Integer, byte[]> serialData;
+    private Map<Integer, SerialData> serialData;
     private static final int SERIAL_BYTE_COUNT = 16;
 
     public Communications(int[] analogInputPorts, int[] analogOutputPorts, int[] digitalInputPorts, int[] digitalOutputPorts, int[] serialPorts) {
@@ -53,7 +53,9 @@ public class Communications {
         }
 
         this.serialPorts = new HashMap<>();
+        this.serialData = new HashMap<>();
         for(int serialPort : serialPorts) {
+            System.out.println("Adding serial port " + serialPort);
             addUSBConnection(serialPort);
         }
     }
@@ -82,15 +84,26 @@ public class Communications {
         }
 
         this.serialPorts = new HashMap<>();
+        this.serialData = new HashMap<>();
         for(int serialPort : serialPorts) {
+            System.out.println("Adding serial port " + serialPort);
             addUSBConnection(serialPort);
         }
     }
 
     public void addUSBConnection(int whichPort) {
-        if(whichPort == 0) serialPorts.put(0, new SerialPort(9600, SerialPort.Port.kMXP));
-        if(whichPort == 1) serialPorts.put(1, new SerialPort(9600, SerialPort.Port.kUSB1));
-        if(whichPort == 2) serialPorts.put(2, new SerialPort(9600, SerialPort.Port.kUSB2));
+        if(whichPort == 0) {
+            serialPorts.put(0, new SerialPort(9600, SerialPort.Port.kMXP));
+            serialData.put(0, new SerialData());
+        }
+        if(whichPort == 1) {
+            serialPorts.put(1, new SerialPort(9600, SerialPort.Port.kUSB1));
+            serialData.put(1, new SerialData());
+        }
+        if(whichPort == 2) {
+            serialPorts.put(2, new SerialPort(9600, SerialPort.Port.kUSB2));
+            serialData.put(2, new SerialData());
+        }
     }
 
     public void update() {
@@ -106,11 +119,9 @@ public class Communications {
 
         Set<Integer> serialInputPorts = serialPorts.keySet();
         for(int serialInputPort : serialInputPorts) {
-            byte[] serialInput = serialPorts.get(serialInputPort).read(SERIAL_BYTE_COUNT);
-            for(byte character : serialInput) {
-                
-            }
-            serialData.put(serialInputPort, );
+            if(serialPorts.get(serialInputPort).getBytesReceived() == 0) continue;
+            String serialInput = serialPorts.get(serialInputPort).readString();
+            serialData.get(serialInputPort).processData(serialInput);
         }
     }
 
@@ -132,8 +143,12 @@ public class Communications {
             digitalOutputs.get(digitalPort).set(value);
     }
 
-    public byte[] getSerialPortInput(int serialPort) {
-        return serialData.containsKey(serialPort) ? serialData.get(serialPort) : new byte[0];
+    public SerialData getSerialData(int serialPort) {
+        return serialData.containsKey(serialPort) ? serialData.get(serialPort) : new SerialData();
+    }
+
+    public String getSerialPortString(int serialPort) {
+        return serialPorts.containsKey(serialPort) ? serialPorts.get(serialPort).readString() : "Communications.java: (No string sent)";
     }
 
     public void sendSerialPortOutput(int serialPort, byte[] data) {
