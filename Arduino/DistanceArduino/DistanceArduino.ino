@@ -15,6 +15,16 @@ float previousRightDistance = 0;
 float left;
 float right;
 
+int numberOfSamples = 5;
+float leftDistances[5] = {0};
+float rightDistances[5] = {0};
+
+int leftSamples = 0;
+int rightSamples = 0;
+int leftBadSamples = 0;
+int rightBadSamples = 0;
+
+
 const float maxAllowableDelta = 10; // Any greater distance than this between reads is thrown out.
  
 bool trustworthy = false;
@@ -39,6 +49,21 @@ float ultrasonicLeft(){
   return inches;
 }
 
+float averagedUltrasonicLeft(){
+  float newDistance = ultrasonicLeft();
+  leftDistances[leftSamples] = newDistance;
+  leftSamples = leftSamples + 1;
+  if (leftSamples > (numberOfSamples - 1)) {
+    leftSamples = 0;
+  }
+  float totalDistance = 0;
+  for (int i = 0; i < numberOfSamples; ++ i) {
+  totalDistance = leftDistances[i] + totalDistance;
+  }
+  float averageDistance = totalDistance / numberOfSamples;
+  return averageDistance;
+}
+
 float ultrasonicRight(){
   float inches, duration;
   digitalWrite(trigPinRight, LOW);
@@ -50,6 +75,21 @@ float ultrasonicRight(){
   duration = pulseIn(echoPinRight, HIGH);
   inches = (duration/2.0) / 74.0;   // Divide by 74 or multiply by 0.0135
   return inches;
+}
+
+float averagedUltrasonicRight(){
+  float newDistance = ultrasonicRight();
+  rightDistances[rightSamples] = newDistance;
+  rightSamples = rightSamples + 1;
+  if (rightSamples > (numberOfSamples - 1)) {
+    rightSamples = 0;
+  }
+  float totalDistance = 0;
+  for (int i = 0; i < numberOfSamples; ++ i) {
+    totalDistance = rightDistances[i] + totalDistance;
+  }
+  float averageDistance = totalDistance / numberOfSamples;
+  return averageDistance;
 }
 
 int getDistance() {
@@ -84,10 +124,19 @@ bool isUltrasonicGood() {
   float rightDelta = abs(previousRightDistance - right);
 
   if (leftDelta > maxAllowableDelta) {
-    trustworthy = false;
-  } else if (rightDelta > maxAllowableDelta) {
-    trustworthy = false;
+    leftBadSamples = leftBadSamples + 1;
   } else {
+    leftBadSamples = 0;
+  }
+  if (rightDelta > maxAllowableDelta) {
+    rightBadSamples = rightBadSamples + 1;
+  } else {
+    rightBadSamples = 0;
+  }
+  if (leftBadSamples > 3  || rightBadSamples > 3){
+    trustworthy = false;
+  }
+  else {
     trustworthy = true;
   }
   
