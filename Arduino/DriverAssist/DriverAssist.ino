@@ -1,40 +1,44 @@
 #include "masterVisionCommunications.h"
+#include "rioCommunications.h"
 //#include "sensorsAPI.h"
 
 masterCommunicationToSlave targetSlave(8);
-masterCommunicationToSlave lineSlave(12);
+masterCommunicationToSlave lineSlave(11);
+masterCommunicationToSlave ultrasonicSlave(12);
 
 bool trackingLine() {
-  lineSlave.canSlaveBeTrusted();
+  if (lineSlave.canSlaveBeTrusted() && ultrasonicSlave.canSlaveBeTrusted()) {
+    return true;
+  }
   return false;
 }
 
 float lineAngle() {
-  return 0.0;
+  return ultrasonicSlave.angleInDegreesFromSlave();
 }
 
 float lineDistance() {
-  return 100.0;
+  return ultrasonicSlave.distanceInInchesFromSlave();
 }
 
 float lineStrafe() {
-  return 0;
+  return lineSlave.strafingPercentageFromSlave();
 }
 
-bool trackingTarget(){
-  return false;
+bool trackingTarget() {
+  return targetSlave.canSlaveBeTrusted();
 }
 
-float targetAngle(){
-  return 0.0;
+float targetAngle() {
+  return targetSlave.angleInDegreesFromSlave();
 }
 
-float targetDistance(){
-  return 100.0;
+float targetDistance() {
+  return targetSlave.distanceInInchesFromSlave();
 }
 
-float targetStrafe(){
-  return 0;
+float targetStrafe() {
+  return targetSlave.strafingPercentageFromSlave();
 }
 
 void commandRio(float angle, float strafe, float distance) {
@@ -45,21 +49,24 @@ void setup() {
   //setupCommunications();
   targetSlave.setup();
   lineSlave.setup();
+  ultrasonicSlave.setup();
   Serial.begin(9600);
 }
 
 
 void loop() {
-  float drivePower;
-  float strafePower;
-  float rotatePower;
+  float drivePower = 0.0;
+  float strafePower = 0.0;
+  float rotatePower = 0.0;
   const float maxAllowableAngle = 30;
   const float maxAllowableDistanceInInches = 60;
   const float minAllowableDrivePower = 0.1; // Motor will burn up if we drive at less than 10%.
   float normalizedAnglePercentage;
+  bool autoPilotAvailable = false;
 
   targetSlave.update();
   lineSlave.update();
+  ultrasonicSlave.update();
 
   if(trackingLine()){
     if(lineAngle() < (-1 * maxAllowableAngle)){
@@ -72,11 +79,16 @@ void loop() {
     rotatePower = normalizedAnglePercentage;
     
     strafePower = lineStrafe();
-    drivePower = 1 - (abs(strafePower) + abs(rotatePower));
+    Serial.print(lineDistance());
+    Serial.print("-");
+    Serial.print(strafePower);
+    Serial.print("-");
+    Serial.print(rotatePower);
+    drivePower = (1 - (abs(strafePower) + abs(rotatePower))) * lineDistance();
     if (drivePower < minAllowableDrivePower) {
       drivePower = 0;
     }
-    
+    autoPilotAvailable = true;
   } else if(trackingTarget()){
 
     if(targetAngle() < (-1 * maxAllowableAngle)){
@@ -90,32 +102,17 @@ void loop() {
       
     rotatePower = normalizedAnglePercentage;
     strafePower = targetStrafe() / 100;
-    drivePower = (1 - (strafePower + rotatePower)) * targetDistance();
-
+    drivePower = (1 - (abs(strafePower) + abs(rotatePower))) * targetDistance();
+    autoPilotAvailable = true;
   } else {
     drivePower = 0;
     strafePower = 0;
     rotatePower = 0;
+    autoPilotAvailable = false;
     //unable to do driverAssist
   }
 
-  //Serial.write(drivePower);
-  //Serial.write(strafePower);
-  //Serial.write(rotatePower);
+  sendTelemetryToRio(autoPilotAvailable, drivePower, strafePower, rotatePower);
 
-  Serial.write("\n");
-  if (lineSlave.canSlaveBeTrusted()) {
-    Serial.write("Good");
-    Serial.print(lineSlave.angleInDegreesFromSlave());
-    Serial.print("° ");
-    Serial.print(lineSlave.distanceInInchesFromSlave());
-    Serial.print("in ");
-    Serial.print(lineSlave.strafingPercentageFromSlave());
-    Serial.print("%\n");
-  } else {
-    Serial.write("Bad");
-  }
-  Serial.write("\n");
   delay(1000);
- 
 }
