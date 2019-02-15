@@ -5,8 +5,8 @@
 
 // Applies boundaries of 0.0 to 1.0 and returns the corrected value.
 double apply_bounds(double value) {
-  if (value < 0.0) {
-    value = 0.0;
+  if (value < -1.0) {
+    value = -1.0;
   } else if ( value > 1.0) {
     value = 1.0;
   }
@@ -14,11 +14,10 @@ double apply_bounds(double value) {
 }
 
 // Copies the number into the buffer, adding leading 0's if the number is shorter than three digits.
-void addLeadingZeros(int number, char *buffer) {
+void addLeadingZeros(int number, char *buffer, int charactersWritten) {
   // Convert the number to a character string
   char characters[4] = {0};
   itoa(number, characters, 10);
-  int charactersWritten = 0;
 
   // If our number is shorter than 3 digits, we need to add leading zeros.
   if (number < 10) {
@@ -64,36 +63,11 @@ int addTelemetryInfoToBuffer(char dataCodeLetter, double value, char* buffer, in
   }
   countOfBytesWritten = countOfBytesWritten + 1;
 
-  // Handle the case that we got too big of a number.
-  if (abs(value) > 1.0) {
-    value = 1.0;
-  }
-
   // Convert the number to a 0-100 whole number, required by our protocol.
-  int wholeNumber = value * 100.0; // This converts the value to whole number, trimming off the decimal place (not rounding).
-
-  addLeadingZeros(wholeNumber, buffer);
+  int wholeNumber = abs(value) * 100.0; // This converts the value to whole number, trimming off the decimal place (not rounding).
+  addLeadingZeros(wholeNumber, buffer, countOfBytesWritten);
   countOfBytesWritten = countOfBytesWritten + 3;
   return countOfBytesWritten;
-}
-
-// Returns the number of characters required to represent the nu
-int number_of_digits(int value) {
-  // Determine if we need
-  int signLength = 0;
-  if (value < 0) {
-      signLength = 1;
-  }
-  int numberOfPlaces = 0;
-  if (value == 100 || value == -100) {
-    numberOfPlaces = 3;
-  } else if (value == 0) {
-    numberOfPlaces = 1;
-  } else {
-      numberOfPlaces = 2;
-  }
-
-  return signLength + numberOfPlaces;
 }
 
 // Uses the serial
@@ -102,29 +76,30 @@ void sendTelemetryToRio(bool trustMe, double forward_percentage, double right_st
       right_strafe_percentage = apply_bounds(right_strafe_percentage);
       clockwise_rotation_percentage = apply_bounds(clockwise_rotation_percentage);
 
-      // We will send one character for the good/bad, and up to four characters for each number (0-100) with a signs
-      const int buffer_length = 1 + 3 * 4;
+      // We will send one character for the good/bad, one character and sign plus three numbers for each piece of telemtery data, plus a line ending.
+      const int buffer_length = 1 + 3 * 5 + 1;
       char send_buffer[buffer_length] = {0}; // The zero in curly braces initializes the array to zero.
 
       if (trustMe) {
         int bytes_written = 0;
         send_buffer[bytes_written] = 'g';
         bytes_written += 1;
-        bytes_written += addTelemetryInfoToBuffer('z', forward_percentage, send_buffer, bytes_written);
-        bytes_written += addTelemetryInfoToBuffer('x', right_strafe_percentage, send_buffer, bytes_written);
-        bytes_written += addTelemetryInfoToBuffer('r', clockwise_rotation_percentage, send_buffer, bytes_written);
+        bytes_written = addTelemetryInfoToBuffer('z', forward_percentage, send_buffer, bytes_written);
+        bytes_written = addTelemetryInfoToBuffer('x', right_strafe_percentage, send_buffer, bytes_written);
+        bytes_written = addTelemetryInfoToBuffer('r', clockwise_rotation_percentage, send_buffer, bytes_written);
 
         // Added a line return at the end.
         send_buffer[bytes_written] = '\n';
         bytes_written += 1;
 
         // Send the whole message
-        Serial.print(send_buffer, bytes_written);
+        Serial.write(send_buffer, bytes_written);
+        Serial.write("\n");
 
       } else {
         send_buffer[0] = 'b';
         send_buffer[1] = '\n';
-        Serial.print(send_buffer, buffer_length);
+        Serial.write(send_buffer, 2);
       }
 }
 #endif
