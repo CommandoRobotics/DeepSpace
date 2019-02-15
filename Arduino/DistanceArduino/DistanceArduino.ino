@@ -37,15 +37,14 @@ void setupElegooUltrasonicSensor(){
 }
 
 float ultrasonicLeft(){
-  float inches, duration;
   digitalWrite(trigPinLeft, LOW);
   delayMicroseconds(5);
   digitalWrite(trigPinLeft, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPinLeft, LOW);
   pinMode(echoPinLeft, INPUT);
-  duration = pulseIn(echoPinLeft, HIGH);
-  inches= (duration/2.0) / 74.0;   // Divide by 74 or multiply by 0.0135
+  float duration = pulseIn(echoPinLeft, HIGH);
+  float inches = (duration/2.0) / 74.0;   // Divide by 74 or multiply by 0.0135
   return inches;
 }
 
@@ -65,15 +64,14 @@ float averagedUltrasonicLeft(){
 }
 
 float ultrasonicRight(){
-  float inches, duration;
   digitalWrite(trigPinRight, LOW);
   delayMicroseconds(5);
   digitalWrite(trigPinRight, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPinRight, LOW);
   pinMode(echoPinRight, INPUT);
-  duration = pulseIn(echoPinRight, HIGH);
-  inches = (duration/2.0) / 74.0;   // Divide by 74 or multiply by 0.0135
+  float duration = pulseIn(echoPinRight, HIGH);
+  float inches = (duration/2.0) / 74.0;   // Divide by 74 or multiply by 0.0135
   return inches;
 }
 
