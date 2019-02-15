@@ -62,7 +62,8 @@ public class DriverAssistControlScheme extends ControlScheme {
 			chassis.driveMecanum(strafePower, drivePower, rotatePower);
 		} else {
 			chassis.stop();
-			finished = true;
+			System.out.println("Working from bad data.");
+			//finished = true;
 		}
 
 		/*

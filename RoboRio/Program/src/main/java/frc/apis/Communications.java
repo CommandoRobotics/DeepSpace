@@ -119,7 +119,7 @@ public class Communications {
 
         Set<Integer> serialInputPorts = serialPorts.keySet();
         for(int serialInputPort : serialInputPorts) {
-            if(serialPorts.get(serialInputPort).getBytesReceived() == 0) continue;
+            //if(serialPorts.get(serialInputPort).getBytesReceived() == 0) continue;
             String serialInput = serialPorts.get(serialInputPort).readString();
             serialData.get(serialInputPort).processData(serialInput);
         }

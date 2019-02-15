@@ -62,8 +62,8 @@ void loop() {
   const float maxAllowableDistanceInInches = 60;
   const float minAllowableDrivePower = 0.1; // Motor will burn up if we drive at less than 10%.
   float normalizedAnglePercentage;
-  char trustMe = b;
-
+  char trustMe = 'b';
+  Serial.println("Here");
   targetSlave.update();
   lineSlave.update();
   ultrasonicSlave.update();
@@ -85,7 +85,7 @@ void loop() {
       drivePower = 0;
     }
 
-    trustMe = g;
+    trustMe = 'g';
 
   } else if(trackingTarget()){
 
@@ -99,15 +99,15 @@ void loop() {
     rotatePower = normalizedAnglePercentage;
     strafePower = targetStrafe() / 100;
     drivePower = (1 - (abs(strafePower) + abs(rotatePower))) * targetDistance();
-    trustMe = g;
+    trustMe = 'g';
 
   } else {
 
     drivePower = 0;
     strafePower = 0;
     rotatePower = 0;
-    autoPilotAvailable = false;
-    trustMe = b;
+    //autoPilotAvailable = false;
+    trustMe = 'b';
     //unable to do driverAssist
   }
 
@@ -115,6 +115,10 @@ void loop() {
   strafePower = strafePower * 100;
   rotatePower = rotatePower * 100;
 
-
+  trustMe = 'g';
+  drivePower = 80;
+  strafePower = 60;
+  rotatePower = 0;
+  Serial.println("About to send");
   sendTelemetryToRio(trustMe, drivePower, strafePower, rotatePower);
 }

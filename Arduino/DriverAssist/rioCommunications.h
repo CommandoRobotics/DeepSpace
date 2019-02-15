@@ -14,33 +14,32 @@ double apply_bounds(double value) {
 }
 
 // Copies the number into the buffer, adding leading 0's if the number is shorter than three digits.
-void addLeadingZeros(int number, char *buffer) {
+void addLeadingZeros(int number, char* theBuffer, int charactersWritten) {
   // Convert the number to a character string
   char characters[4] = {0};
   itoa(number, characters, 10);
-  int charactersWritten = 0;
-
+  
   // If our number is shorter than 3 digits, we need to add leading zeros.
   if (number < 10) {
-    buffer[charactersWritten] = '0';
+    theBuffer[charactersWritten] = '0';
     charactersWritten = charactersWritten + 1;
-    buffer[charactersWritten] = '0';
+    theBuffer[charactersWritten] = '0';
     charactersWritten = charactersWritten + 1;
-    buffer[charactersWritten] = characters[0];
+    theBuffer[charactersWritten] = characters[0];
     charactersWritten = charactersWritten + 1;
   } else if (number < 100) {
-    buffer[charactersWritten] = '0';
+    theBuffer[charactersWritten] = '0';
     charactersWritten = charactersWritten + 1;
-    buffer[charactersWritten] = characters[0];
+    theBuffer[charactersWritten] = characters[0];
     charactersWritten = charactersWritten + 1;
-    buffer[charactersWritten] = characters[1];
+    theBuffer[charactersWritten] = characters[1];
     charactersWritten = charactersWritten + 1;
   } else {
-    buffer[charactersWritten] = characters[0];
+    theBuffer[charactersWritten] = characters[0];
     charactersWritten = charactersWritten + 1;
-    buffer[charactersWritten] = characters[1];
+    theBuffer[charactersWritten] = characters[1];
     charactersWritten = charactersWritten + 1;
-    buffer[charactersWritten] = characters[2];
+    theBuffer[charactersWritten] = characters[2];
     charactersWritten = charactersWritten + 1;
   }
 }
@@ -51,16 +50,16 @@ void addLeadingZeros(int number, char *buffer) {
 // buffer: Pointer to the send buffer.
 // countOfBytesWritten: How many bytes have already been written into the buffer. This allows the function to determine where the telemetry needs to be added, so it does not overwrite existing data.
 // Returns: The number of bytes written to the buffer. You should add this to countsOfBytesWritten before calling this function next time.
-int addTelemetryInfoToBuffer(char dataCodeLetter, double value, char* buffer, int countOfBytesWritten) {
+int addTelemetryInfoToBuffer(char dataCodeLetter, double value, char* theBuffer, int countOfBytesWritten) {
   // Start with the code letter
-  buffer[countOfBytesWritten] = dataCodeLetter;
+  theBuffer[countOfBytesWritten] = dataCodeLetter;
   countOfBytesWritten = countOfBytesWritten + 1;
 
   // Include the appropriate sign
   if (value >= 0.0) {
-    buffer[countOfBytesWritten] = '+';
+    theBuffer[countOfBytesWritten] = '+';
   } else {
-    buffer[countOfBytesWritten] = '-';
+    theBuffer[countOfBytesWritten] = '-';
   }
   countOfBytesWritten = countOfBytesWritten + 1;
 
@@ -72,8 +71,9 @@ int addTelemetryInfoToBuffer(char dataCodeLetter, double value, char* buffer, in
   // Convert the number to a 0-100 whole number, required by our protocol.
   int wholeNumber = value * 100.0; // This converts the value to whole number, trimming off the decimal place (not rounding).
 
-  addLeadingZeros(wholeNumber, buffer);
+  addLeadingZeros(wholeNumber, theBuffer, countOfBytesWritten);
   countOfBytesWritten = countOfBytesWritten + 3;
+  
   return countOfBytesWritten;
 }
 
@@ -105,26 +105,28 @@ void sendTelemetryToRio(bool trustMe, double forward_percentage, double right_st
       // We will send one character for the good/bad, and up to four characters for each number (0-100) with a signs
       const int buffer_length = 1 + 3 * 4;
       char send_buffer[buffer_length] = {0}; // The zero in curly braces initializes the array to zero.
-
       if (trustMe) {
         int bytes_written = 0;
         send_buffer[bytes_written] = 'g';
+        Serial.write(send_buffer, bytes_written);
         bytes_written += 1;
         bytes_written += addTelemetryInfoToBuffer('z', forward_percentage, send_buffer, bytes_written);
+        //Serial.println("Stuck 3");
         bytes_written += addTelemetryInfoToBuffer('x', right_strafe_percentage, send_buffer, bytes_written);
+        //Serial.println("Stuck 4");
         bytes_written += addTelemetryInfoToBuffer('r', clockwise_rotation_percentage, send_buffer, bytes_written);
+        //Serial.println("Stuck 5");
 
         // Added a line return at the end.
         send_buffer[bytes_written] = '\n';
         bytes_written += 1;
+        Serial.write(send_buffer, bytes_written);
 
-        // Send the whole message
-        Serial.print(send_buffer, bytes_written);
 
       } else {
         send_buffer[0] = 'b';
         send_buffer[1] = '\n';
-        Serial.print(send_buffer, buffer_length);
+        Serial.write(send_buffer, 2);
       }
 }
 #endif

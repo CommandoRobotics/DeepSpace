@@ -31,6 +31,7 @@ public class SerialData {
     }
 
     public void processData(String incomingData) {
+        System.out.println("Appending string " + incomingData);
         for(int i = 0; i < incomingData.length(); i++) {
             char incomingChar = incomingData.charAt(i);
 
@@ -41,6 +42,7 @@ public class SerialData {
                     this.timeDataReceived = System.nanoTime();
                 }
 
+                System.out.println("Moving on from " + this.incomingData.toString());
                 this.incomingData.setLength(0);
             }
 
