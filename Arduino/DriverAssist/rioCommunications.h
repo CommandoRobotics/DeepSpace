@@ -41,7 +41,7 @@ void addLeadingZeros(int number, char *buffer) {
     buffer[charactersWritten] = characters[1];
     charactersWritten = charactersWritten + 1;
     buffer[charactersWritten] = characters[2];
-    charactersWritten = charactersWritten + 1; 
+    charactersWritten = charactersWritten + 1;
   }
 }
 
@@ -55,7 +55,7 @@ int addTelemetryInfoToBuffer(char dataCodeLetter, double value, char* buffer, in
   // Start with the code letter
   buffer[countOfBytesWritten] = dataCodeLetter;
   countOfBytesWritten = countOfBytesWritten + 1;
-  
+
   // Include the appropriate sign
   if (value >= 0.0) {
     buffer[countOfBytesWritten] = '+';
@@ -63,12 +63,12 @@ int addTelemetryInfoToBuffer(char dataCodeLetter, double value, char* buffer, in
     buffer[countOfBytesWritten] = '-';
   }
   countOfBytesWritten = countOfBytesWritten + 1;
-  
+
   // Handle the case that we got too big of a number.
   if (abs(value) > 1.0) {
     value = 1.0;
   }
-  
+
   // Convert the number to a 0-100 whole number, required by our protocol.
   int wholeNumber = value * 100.0; // This converts the value to whole number, trimming off the decimal place (not rounding).
 
@@ -96,7 +96,7 @@ int number_of_digits(int value) {
   return signLength + numberOfPlaces;
 }
 
-// Uses the serial 
+// Uses the serial
 void sendTelemetryToRio(bool trustMe, double forward_percentage, double right_strafe_percentage, double clockwise_rotation_percentage) {
       forward_percentage = apply_bounds(forward_percentage);
       right_strafe_percentage = apply_bounds(right_strafe_percentage);
@@ -105,7 +105,7 @@ void sendTelemetryToRio(bool trustMe, double forward_percentage, double right_st
       // We will send one character for the good/bad, and up to four characters for each number (0-100) with a signs
       const int buffer_length = 1 + 3 * 4;
       char send_buffer[buffer_length] = {0}; // The zero in curly braces initializes the array to zero.
-      
+
       if (trustMe) {
         int bytes_written = 0;
         send_buffer[bytes_written] = 'g';
@@ -119,12 +119,12 @@ void sendTelemetryToRio(bool trustMe, double forward_percentage, double right_st
         bytes_written += 1;
 
         // Send the whole message
-        Serial.write(send_buffer, bytes_written);
+        Serial.print(send_buffer, bytes_written);
 
       } else {
         send_buffer[0] = 'b';
         send_buffer[1] = '\n';
-        Serial.write(send_buffer, buffer_length);
+        Serial.print(send_buffer, buffer_length);
       }
 }
 #endif
