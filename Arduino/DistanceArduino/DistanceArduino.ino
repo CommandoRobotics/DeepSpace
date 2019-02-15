@@ -36,20 +36,21 @@ void setupElegooUltrasonicSensor(){
   pinMode(echoPinRight, INPUT);
 }
 
-float ultrasonicLeft(){
-  digitalWrite(trigPinLeft, LOW);
+float readUltrasonicSensor(int triggerPin, int echoPin) {
+  digitalWrite(triggerPin, LOW);
   delayMicroseconds(5);
-  digitalWrite(trigPinLeft, HIGH);
+  digitalWrite(triggerPin, HIGH);
   delayMicroseconds(10);
-  digitalWrite(trigPinLeft, LOW);
-  pinMode(echoPinLeft, INPUT);
-  float duration = pulseIn(echoPinLeft, HIGH);
+  digitalWrite(triggerPin, LOW);
+  pinMode(echoPin, INPUT);
+  float duration = pulseIn(echoPin, HIGH);
   float inches = (duration/2.0) / 74.0;   // Divide by 74 or multiply by 0.0135
   return inches;
 }
 
+
 float averagedUltrasonicLeft(){
-  float newDistance = ultrasonicLeft();
+  float newDistance = readUltrasonicSensor(trigPinLeft, echoPinLeft);
   leftDistances[leftSamples] = newDistance;
   leftSamples = leftSamples + 1;
   if (leftSamples > (numberOfSamples - 1)) {
@@ -63,20 +64,8 @@ float averagedUltrasonicLeft(){
   return averageDistance;
 }
 
-float ultrasonicRight(){
-  digitalWrite(trigPinRight, LOW);
-  delayMicroseconds(5);
-  digitalWrite(trigPinRight, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPinRight, LOW);
-  pinMode(echoPinRight, INPUT);
-  float duration = pulseIn(echoPinRight, HIGH);
-  float inches = (duration/2.0) / 74.0;   // Divide by 74 or multiply by 0.0135
-  return inches;
-}
-
 float averagedUltrasonicRight(){
-  float newDistance = ultrasonicRight();
+  float newDistance = readUltrasonicSensor(trigPinRight, echoPinRight);
   rightDistances[rightSamples] = newDistance;
   rightSamples = rightSamples + 1;
   if (rightSamples > (numberOfSamples - 1)) {
@@ -145,8 +134,8 @@ bool isUltrasonicGood() {
 }
 
 void updateUltrasonic() {
-  left = ultrasonicLeft();
-  right = ultrasonicRight();
+  left = readUltrasonicSensor(trigPinLeft, echoPinLeft);
+  right = readUltrasonicSensor(trigPinRight, echoPinRight);
 }
 
 //setup

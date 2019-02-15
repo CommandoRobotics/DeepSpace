@@ -15,7 +15,6 @@ public:
     visionTransmission slaveInfo;
     static const int transmissionSize = sizeof(slaveInfo);
     byte transmissionBuffer[transmissionSize];
-    
 
     // Constructor. Pass in the addres of the slave this master will communicate with.
     masterCommunicationToSlave(int slaveAddress) {
