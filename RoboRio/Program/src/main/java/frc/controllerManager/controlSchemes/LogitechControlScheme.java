@@ -66,17 +66,11 @@ public class LogitechControlScheme extends ControlScheme {
 
         if(leftPower > deadZone && rightPower > deadZone) {
             double averagePower = (leftPower + rightPower) / 2;
-            cargoSystem.setIntake(-averagePower);
-            cargoSystem.setConveyorBelt(-averagePower);
-            cargoSystem.setCargoOutput(-averagePower);
+            cargoSystem.expelAllContents(averagePower);
         } else if(leftPower > deadZone) {
-            cargoSystem.setIntake(leftPower);
-            cargoSystem.setConveyorBelt(leftPower);
-            cargoSystem.setCargoOutput(0);
+            cargoSystem.intake(leftPower);
         } else if(rightPower > deadZone) {
-            cargoSystem.setIntake(0);
-            cargoSystem.setConveyorBelt(0);
-            cargoSystem.setCargoOutput(rightPower);
+            cargoSystem.shoot(rightPower);
         } else {
             cargoSystem.stop();
         }

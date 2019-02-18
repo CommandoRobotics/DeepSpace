@@ -58,9 +58,7 @@ public class TrackedJoystick extends Joystick {
             
             if(buttonPressed) receivedInput = true;
             buttonJustPressed.put(buttonToTrack, !buttonHeld.get(buttonToTrack) && buttonPressed);
-            this.buttonHeld.put(buttonToTrack, buttonPressed);
-            System.out.println("Button " + buttonToTrack + " just pressed? " + buttonJustPressed.get(buttonToTrack));
-            
+            this.buttonHeld.put(buttonToTrack, buttonPressed);            
         }
     }
 

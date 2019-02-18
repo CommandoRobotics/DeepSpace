@@ -42,7 +42,7 @@ float targetStrafe() {
 }
 
 void commandRio(float angle, float strafe, float distance) {
-  
+
 }
 
 void setup() {
@@ -62,33 +62,31 @@ void loop() {
   const float maxAllowableDistanceInInches = 60;
   const float minAllowableDrivePower = 0.1; // Motor will burn up if we drive at less than 10%.
   float normalizedAnglePercentage;
-  bool autoPilotAvailable = false;
+  char trustMe = 'b';
 
   targetSlave.update();
   lineSlave.update();
   ultrasonicSlave.update();
 
   if(trackingLine()){
+
     if(lineAngle() < (-1 * maxAllowableAngle)){
       normalizedAnglePercentage = 1;
     } else if (lineAngle() > maxAllowableAngle) {
       normalizedAnglePercentage = -1;
     } else{
       normalizedAnglePercentage = lineAngle() / maxAllowableAngle;
-    }   
+    }
+
     rotatePower = normalizedAnglePercentage;
-    
     strafePower = lineStrafe();
-    Serial.print(lineDistance());
-    Serial.print("-");
-    Serial.print(strafePower);
-    Serial.print("-");
-    Serial.print(rotatePower);
     drivePower = (1 - (abs(strafePower) + abs(rotatePower))) * lineDistance();
     if (drivePower < minAllowableDrivePower) {
       drivePower = 0;
     }
-    autoPilotAvailable = true;
+
+    trustMe = 'g';
+
   } else if(trackingTarget()){
 
     if(targetAngle() < (-1 * maxAllowableAngle)){
@@ -99,20 +97,19 @@ void loop() {
       normalizedAnglePercentage = targetAngle() / maxAllowableAngle;
     }
     rotatePower = normalizedAnglePercentage;
-      
-    rotatePower = normalizedAnglePercentage;
     strafePower = targetStrafe() / 100;
     drivePower = (1 - (abs(strafePower) + abs(rotatePower))) * targetDistance();
-    autoPilotAvailable = true;
+    trustMe = 'g';
+
   } else {
-    drivePower = 0;
-    strafePower = 0;
-    rotatePower = 0;
-    autoPilotAvailable = false;
+
+    drivePower = 0.3;
+    strafePower = 0.4;
+    rotatePower = 0.5;
+    trustMe = 'b';
     //unable to do driverAssist
   }
 
-  sendTelemetryToRio(autoPilotAvailable, drivePower, strafePower, rotatePower);
-
-  delay(1000);
+  sendTelemetryToRio(trustMe, drivePower, strafePower, rotatePower);
+  delay(10);
 }
