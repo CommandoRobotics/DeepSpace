@@ -81,7 +81,7 @@ float averagedUltrasonicRight(){
 
 int getDistance() {
   int center;
-  center = (left+right)/2.0;
+  center = (averagedUltrasonicLeft()+averagedUltrasonicRight())/2.0;
   if (center > 255) {
     center = 255;
   }
@@ -153,15 +153,16 @@ void loop() {
   updateUltrasonic();
   if (isUltrasonicGood()) {
     trustMe = true;
-    Serial.print(left);
-    Serial.print(",");
-    Serial.print(right);
-    Serial.print (" ");
+//    Serial.print(left);
+//    Serial.print(",");
+//    Serial.print(right);
+//    Serial.print (" ");
     Serial.print(getDistance());
-    Serial.print("in. @");
+    Serial.print("in. @");     
     Serial.print(getRotationInDegrees());
     Serial.print(" ");
     Serial.print("\n");
+
     updateDataForReplyToMaster(trustMe, getRotationInDegrees(), getDistance(), 0);
   } else {
     trustMe = false;
@@ -169,5 +170,5 @@ void loop() {
     updateDataForReplyToMaster(trustMe, 0, 0, 0);
   }
   Serial.print("\n");
-  //delay(1000);
+  delay(1000);
 }
