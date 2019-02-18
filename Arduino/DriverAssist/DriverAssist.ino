@@ -41,6 +41,22 @@ float targetStrafe() {
   return targetSlave.strafingPercentageFromSlave();
 }
 
+bool ultrasonicHasVision() {
+  return ultrasonicSlave.canSlaveBeTrusted();
+}
+
+float ultrasonicAngle() {
+  return ultrasonicSlave.angleInDegreesFromSlave();
+}
+
+float ultrasonicDistance() {
+  return ultrasonicSlave.distanceInInchesFromSlave();
+}
+
+float ultrasonicStrafe() {
+  return ultrasonicSlave.strafingPercentageFromSlave();
+}
+
 void commandRio(float angle, float strafe, float distance) {
 
 }
@@ -51,6 +67,14 @@ void setup() {
   lineSlave.setup();
   ultrasonicSlave.setup();
   Serial.begin(9600);
+}
+
+float angleToRotationPower(float angle) {
+  return angle / 90.0;
+}
+
+float distanceToDrivePower(float distanceInInches) {
+  
 }
 
 
@@ -68,8 +92,7 @@ void loop() {
   lineSlave.update();
   ultrasonicSlave.update();
 
-  if(trackingLine()){
-
+  /*if(trackingLine()){
     if(lineAngle() < (-1 * maxAllowableAngle)){
       normalizedAnglePercentage = 1;
     } else if (lineAngle() > maxAllowableAngle) {
@@ -87,8 +110,8 @@ void loop() {
 
     trustMe = 'g';
 
-  } else if(trackingTarget()){
-
+  } else */if(trackingTarget()){
+    Serial.println("Tracking target");
     if(targetAngle() < (-1 * maxAllowableAngle)){
       normalizedAnglePercentage = 1;
     } else if (targetAngle() > maxAllowableAngle) {
@@ -96,6 +119,11 @@ void loop() {
     } else{
       normalizedAnglePercentage = targetAngle() / maxAllowableAngle;
     }
+
+  Serial.print("Target Data: ");
+  Serial.println(targetAngle());
+  Serial.println(targetStrafe());
+    
     rotatePower = normalizedAnglePercentage;
     strafePower = targetStrafe() / 100;
     drivePower = (1 - (abs(strafePower) + abs(rotatePower))) * targetDistance();
@@ -110,6 +138,6 @@ void loop() {
     //unable to do driverAssist
   }
 
+  
   sendTelemetryToRio(trustMe, drivePower, strafePower, rotatePower);
-  delay(10);
 }
