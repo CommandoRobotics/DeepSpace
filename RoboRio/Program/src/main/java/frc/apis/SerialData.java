@@ -5,7 +5,6 @@ public class SerialData {
     private String data;
     private StringBuilder incomingData;
     private int numValidCharacters;
-    private static final int SERIAL_DATA_LENGTH = 16;
     private static final char[] START_CHARACTERS = new char[]{'g', 'b'};
 
     private long timeDataReceived;
@@ -31,7 +30,6 @@ public class SerialData {
     }
 
     public void processData(String incomingData) {
-        System.out.println("Appending string " + incomingData);
         for(int i = 0; i < incomingData.length(); i++) {
             char incomingChar = incomingData.charAt(i);
 
@@ -41,8 +39,6 @@ public class SerialData {
                     data = this.incomingData.toString();
                     this.timeDataReceived = System.nanoTime();
                 }
-
-                System.out.println("Moving on from " + this.incomingData.toString());
                 this.incomingData.setLength(0);
             }
 

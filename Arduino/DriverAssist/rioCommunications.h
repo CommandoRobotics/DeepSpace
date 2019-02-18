@@ -92,7 +92,7 @@ void sendTelemetryToRio(bool trustMe, double forward_percentage, double right_st
         send_buffer[bytes_written] = '\n';
         bytes_written += 1;
 
-        // Send the whole message
+        // Send the whole message+
         Serial.write(send_buffer, bytes_written);
         Serial.write("\n");
 

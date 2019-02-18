@@ -23,7 +23,6 @@ public class Communications {
 
     private Map<Integer, SerialPort> serialPorts;
     private Map<Integer, SerialData> serialData;
-    private static final int SERIAL_BYTE_COUNT = 16;
 
     public Communications(int[] analogInputPorts, int[] analogOutputPorts, int[] digitalInputPorts, int[] digitalOutputPorts, int[] serialPorts) {
         AnalogInput.setGlobalSampleRate(62500);
@@ -122,6 +121,14 @@ public class Communications {
             //if(serialPorts.get(serialInputPort).getBytesReceived() == 0) continue;
             String serialInput = serialPorts.get(serialInputPort).readString();
             serialData.get(serialInputPort).processData(serialInput);
+        }
+    }
+
+    public void reset() {
+        Set<Integer> serialInputPorts = serialPorts.keySet();
+        for(int serialInputPort : serialInputPorts) {
+            //if(serialPorts.get(serialInputPort).getBytesReceived() == 0) continue;
+            serialPorts.get(serialInputPort).reset();
         }
     }
 

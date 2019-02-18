@@ -17,22 +17,17 @@ public class DriverAssistControlScheme extends ControlScheme {
 	private Communications communications;
 
 	//TODO: Set all of these ports to what they should be
-	private static final int STRAFE_ANALOG_PORT = 1;
-	private static final int DRIVE_FORWARD_ANALOG_PORT = 0;
-	private static final int ROTATE_ANALOG_PORT = 2;
 	private static final int DRIVER_ASSIST_CAN_BEGIN_PORT = 1;
 	private static final int DRIVER_ASSIST_FINISHED_DIGITAL_PORT = 2;
 	private static final int CAN_SHOOT_DIGITAL_PORT = 3;
 	private static final int SERIAL_PORT = 0;
 
-	private boolean hasChassis = false;
-		private MecanumChassis chassis;
+	private MecanumChassis chassis;
 
 	public DriverAssistControlScheme(Communications communications, MecanumChassis chassis) {
 		this.communications = communications;
 
 		this.chassis = chassis;
-		this.hasChassis = this.chassis != null;
 		
 		this.finished = false;
 		this.canShoot = false;
@@ -57,8 +52,9 @@ public class DriverAssistControlScheme extends ControlScheme {
 		if(serialData.dataGood()) {
 			double strafePower = SerialData.parsePercentage(serialData, 'x');
 			double drivePower = SerialData.parsePercentage(serialData, 'z');
-			double rotatePower = SerialData.parsePercentage(serialData, 'y');
+			double rotatePower = SerialData.parsePercentage(serialData, 'r');
 
+			System.out.println("Driving at " + drivePower + " " + strafePower + " " + rotatePower);
 			chassis.driveMecanum(strafePower, drivePower, rotatePower);
 		} else {
 			chassis.stop();
@@ -78,15 +74,6 @@ public class DriverAssistControlScheme extends ControlScheme {
 			canShoot = communications.getDigitalPortInput(CAN_SHOOT_DIGITAL_PORT);
 		}
 		*/
-	}
-
-	private double scaleAnalogInput(double input) {
-		//Prevents negative values from being passed as parameters.
-		//Also catches the potential edge case that would cause an absence of a signal to send the robot shooting off in one direction.
-		 if(input < MINIMUM_ANALOG) return 0;
-		if(Math.abs(input - ANALOG_MEDIAN_VOLTAGE) < ANALOG_DEADZONE) return 0;
-
-		return (input - ANALOG_MEDIAN_VOLTAGE) / ANALOG_MEDIAN_VOLTAGE;
 	}
 
 	public boolean canBegin() {

@@ -103,12 +103,13 @@ void loop() {
 
   } else {
 
-    drivePower = 0;
-    strafePower = 0;
-    rotatePower = 0;
+    drivePower = 0.3;
+    strafePower = 0.4;
+    rotatePower = 0.5;
     trustMe = 'b';
     //unable to do driverAssist
   }
 
   sendTelemetryToRio(trustMe, drivePower, strafePower, rotatePower);
+  delay(10);
 }

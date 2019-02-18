@@ -28,7 +28,7 @@ public class Robot extends TimedRobot {
   private HatchMechanism hatchMechanism;
   private CargoSystem cargoSystem;
 
-  private LogitechControlScheme controlScheme;
+  private TwoJoystickControlScheme controlScheme;
   private DriverAssistControlScheme driverAssist;
 
   private Communications communications;
@@ -47,18 +47,18 @@ public class Robot extends TimedRobot {
     background = true;
     SmartDashboard.putBoolean(" ", background);
 
-    this.chassis = new MecanumChassis(new Spark(3), new Spark(1), new Spark(0), new Spark(2));
-    this.hatchMechanism = new HatchMechanism(0, 1);
-    this.cargoSystem = new CargoSystem(new CargoIntake(4, 0), new CargoConveyorBelt(7), new CargoOutput(5, 6));
-
     this.communications = new Communications(
       new int[]{0, 1},
       new int[]{},
       new int[]{1, 2},
       new int[]{3, WHICH_ALLIANCE_DIGITAL_PORT},
       new int[]{0});
+
+    this.chassis = new MecanumChassis(new Spark(0), new Spark(1), new Spark(3), new Spark(2));
+    this.hatchMechanism = new HatchMechanism(0, 1);
+    this.cargoSystem = new CargoSystem(new CargoIntake(6), new CargoConveyorBelt(4), new CargoOutput(5, 7), communications);
 	  
-    this.controlScheme = new LogitechControlScheme(chassis, hatchMechanism, cargoSystem);//9,8,7,6
+    this.controlScheme = new TwoJoystickControlScheme(chassis, hatchMechanism, cargoSystem);//9,8,7,6
 	  this.driverAssist = new DriverAssistControlScheme(communications, chassis);
   }
 
@@ -70,7 +70,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-
+    communications.reset();
   }
 
   @Override
@@ -81,6 +81,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     this.currentState = DRIVER_CONTROL_STATE;
+    communications.reset();
   }
 
   @Override
