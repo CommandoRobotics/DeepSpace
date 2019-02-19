@@ -57,7 +57,7 @@ public class DriverAssistControlScheme extends ControlScheme {
 			chassis.driveMecanum(strafePower / 2.0, drivePower / 2.0, rotatePower / 2.0);
 		} else {
 			chassis.stop();
-			System.out.println("Working from bad data.");
+			System.out.println("Requested data has expired.");
 			//finished = true;
 		}
 
@@ -73,6 +73,8 @@ public class DriverAssistControlScheme extends ControlScheme {
 			canShoot = communications.getDigitalPortInput(CAN_SHOOT_DIGITAL_PORT);
 		}
 		*/
+
+		System.out.println("===End of Driver Assist Frame===");
 	}
 
 	public boolean isFinished() {

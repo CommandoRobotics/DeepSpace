@@ -92,7 +92,7 @@ void loop() {
   lineSlave.update();
   ultrasonicSlave.update();
 
-  /*if(trackingLine()){
+  if(trackingLine()){
     if(lineAngle() < (-1 * maxAllowableAngle)){
       normalizedAnglePercentage = 1;
     } else if (lineAngle() > maxAllowableAngle) {
@@ -110,7 +110,7 @@ void loop() {
 
     trustMe = 'g';
 
-  } else */if(trackingTarget()){
+  } else if(trackingTarget()){
     Serial.println("Tracking target");
     if(targetAngle() < (-1 * maxAllowableAngle)){
       normalizedAnglePercentage = 1;
