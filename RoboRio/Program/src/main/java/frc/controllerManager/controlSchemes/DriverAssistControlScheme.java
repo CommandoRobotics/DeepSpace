@@ -36,8 +36,7 @@ public class DriverAssistControlScheme extends ControlScheme {
 	public void start() {
 		System.out.println("Starting Driver Assist");
 		//If we are being told that the driver assist program cannot begin, then we want to immediately declare the program to be finished running.
-		finished = !canBegin();
-		canShoot = false;
+		finished = false;
 		System.out.println("Can we start? " + !finished);
 	}
 
@@ -55,10 +54,10 @@ public class DriverAssistControlScheme extends ControlScheme {
 			double rotatePower = SerialData.parsePercentage(serialData, 'r');
 
 			System.out.println("Driving at " + drivePower + " " + strafePower + " " + rotatePower);
-			chassis.driveMecanum(strafePower, drivePower, rotatePower);
+			chassis.driveMecanum(strafePower / 2.0, drivePower / 2.0, rotatePower / 2.0);
 		} else {
 			chassis.stop();
-			System.out.println("Working from bad data.");
+			System.out.println("Requested data has expired.");
 			//finished = true;
 		}
 
@@ -74,17 +73,11 @@ public class DriverAssistControlScheme extends ControlScheme {
 			canShoot = communications.getDigitalPortInput(CAN_SHOOT_DIGITAL_PORT);
 		}
 		*/
-	}
 
-	public boolean canBegin() {
-		return communications.getDigitalPortInput(DRIVER_ASSIST_CAN_BEGIN_PORT);
+		System.out.println("===End of Driver Assist Frame===");
 	}
 
 	public boolean isFinished() {
 		return finished;
-	}
-
-	public boolean getCanShoot() {
-		return canShoot;
 	}
 }

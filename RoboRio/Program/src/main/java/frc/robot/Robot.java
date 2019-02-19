@@ -56,7 +56,7 @@ public class Robot extends TimedRobot {
 
     this.chassis = new MecanumChassis(new Spark(0), new Spark(1), new Spark(3), new Spark(2));
     this.hatchMechanism = new HatchMechanism(0, 1);
-    this.cargoSystem = new CargoSystem(new CargoIntake(6), new CargoConveyorBelt(4), new CargoOutput(5, 7), communications);
+    this.cargoSystem = new CargoSystem(new CargoIntake(6), new CargoConveyorBelt(4), new CargoOutput(5, 7), new ArmWinch(8), communications);
 	  
     this.controlScheme = new TwoJoystickControlScheme(chassis, hatchMechanism, cargoSystem);//9,8,7,6
 	  this.driverAssist = new DriverAssistControlScheme(communications, chassis);
@@ -86,7 +86,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    SmartDashboard.putBoolean(" ", driverAssist.canBegin());
+    SmartDashboard.putBoolean(" ", false);
 
     communications.update();
 

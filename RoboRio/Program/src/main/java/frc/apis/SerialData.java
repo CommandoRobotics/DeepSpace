@@ -38,6 +38,8 @@ public class SerialData {
                 if(this.incomingData.charAt(0) == 'g') {
                     data = this.incomingData.toString();
                     this.timeDataReceived = System.nanoTime();
+                } else {
+                    System.out.println("Got a bad data indicator.");
                 }
                 this.incomingData.setLength(0);
             }
@@ -45,6 +47,10 @@ public class SerialData {
             numValidCharacters++;
             this.incomingData.append(incomingChar);
         }
+
+        System.out.println("Current Data: " + this.data);
+        System.out.println("Incoming Data: " + data);
+
     }    
 
     public boolean dataGood() {
