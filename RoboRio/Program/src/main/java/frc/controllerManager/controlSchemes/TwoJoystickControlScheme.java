@@ -38,7 +38,7 @@ public class TwoJoystickControlScheme extends ControlScheme {
 
         this.chassis = chassis;
         this.hasChassis = this.chassis != null;
-        this.driveControlsReversed = false;
+        this.driveControlsReversed = true;
 
         this.hatchMechanism = hatchMechanism;
         this.hasHatchMechanism = this.hatchMechanism != null;
