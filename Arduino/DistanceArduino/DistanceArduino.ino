@@ -36,21 +36,21 @@ void setupElegooUltrasonicSensor(){
   pinMode(echoPinRight, INPUT);
 }
 
-float readUltrasonicSensor(int triggerPin, int echoPin) {
-  digitalWrite(triggerPin, LOW);
+float ultrasonicLeft(){
+  float inches, duration;
+  digitalWrite(trigPinLeft, LOW);
   delayMicroseconds(5);
-  digitalWrite(triggerPin, HIGH);
+  digitalWrite(trigPinLeft, HIGH);
   delayMicroseconds(10);
-  digitalWrite(triggerPin, LOW);
-  pinMode(echoPin, INPUT);
-  float duration = pulseIn(echoPin, HIGH);
-  float inches = (duration/2.0) / 74.0;   // Divide by 74 or multiply by 0.0135
+  digitalWrite(trigPinLeft, LOW);
+  pinMode(echoPinLeft, INPUT);
+  duration = pulseIn(echoPinLeft, HIGH);
+  inches= (duration/2.0) / 74.0;   // Divide by 74 or multiply by 0.0135
   return inches;
 }
 
-
 float averagedUltrasonicLeft(){
-  float newDistance = readUltrasonicSensor(trigPinLeft, echoPinLeft);
+  float newDistance = ultrasonicLeft();
   leftDistances[leftSamples] = newDistance;
   leftSamples = leftSamples + 1;
   if (leftSamples > (numberOfSamples - 1)) {
@@ -64,8 +64,21 @@ float averagedUltrasonicLeft(){
   return averageDistance;
 }
 
+float ultrasonicRight(){
+  float inches, duration;
+  digitalWrite(trigPinRight, LOW);
+  delayMicroseconds(5);
+  digitalWrite(trigPinRight, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPinRight, LOW);
+  pinMode(echoPinRight, INPUT);
+  duration = pulseIn(echoPinRight, HIGH);
+  inches = (duration/2.0) / 74.0;   // Divide by 74 or multiply by 0.0135
+  return inches;
+}
+
 float averagedUltrasonicRight(){
-  float newDistance = readUltrasonicSensor(trigPinRight, echoPinRight);
+  float newDistance = ultrasonicRight();
   rightDistances[rightSamples] = newDistance;
   rightSamples = rightSamples + 1;
   if (rightSamples > (numberOfSamples - 1)) {
@@ -134,8 +147,8 @@ bool isUltrasonicGood() {
 }
 
 void updateUltrasonic() {
-  left = readUltrasonicSensor(trigPinLeft, echoPinLeft);
-  right = readUltrasonicSensor(trigPinRight, echoPinRight);
+  left = ultrasonicLeft();
+  right = ultrasonicRight();
 }
 
 //setup
@@ -170,5 +183,4 @@ void loop() {
     updateDataForReplyToMaster(trustMe, 0, 0, 0);
   }
   Serial.print("\n");
-  delay(1000);
 }

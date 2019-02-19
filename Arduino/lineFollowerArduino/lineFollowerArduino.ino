@@ -24,6 +24,7 @@ float getLineReference() {
 
 void setupPixyCam(){
   pixy2.init();
+  pixy2.setLED(255, 255, 255);
 }
 
 void setup() {
