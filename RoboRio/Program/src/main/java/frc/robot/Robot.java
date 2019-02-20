@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
     this.communications = new Communications(
       new int[]{0, 1},
       new int[]{},
-      new int[]{1, 2},
+      new int[]{0, 1, 2},
       new int[]{3, WHICH_ALLIANCE_DIGITAL_PORT},
       new int[]{0});
 

@@ -68,7 +68,7 @@ public class LogitechControlScheme extends ControlScheme {
             double averagePower = (leftPower + rightPower) / 2;
             cargoSystem.expelAllContents(averagePower);
         } else if(leftPower > deadZone) {
-            cargoSystem.intake(leftPower);
+            cargoSystem.intake(leftPower, 1.0);
         } else if(rightPower > deadZone) {
             cargoSystem.shoot(rightPower);
         } else {

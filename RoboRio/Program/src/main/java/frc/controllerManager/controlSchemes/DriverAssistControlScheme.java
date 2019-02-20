@@ -54,7 +54,7 @@ public class DriverAssistControlScheme extends ControlScheme {
 			double rotatePower = SerialData.parsePercentage(serialData, 'r');
 
 			System.out.println("Driving at " + drivePower + " " + strafePower + " " + rotatePower);
-			chassis.driveMecanum(strafePower / 2.0, drivePower / 2.0, rotatePower / 2.0);
+			chassis.driveMecanum(strafePower, drivePower, rotatePower);
 		} else {
 			chassis.stop();
 			System.out.println("Requested data has expired.");

@@ -82,7 +82,7 @@ void loop() {
   float drivePower = 0.0;
   float strafePower = 0.0;
   float rotatePower = 0.0;
-  const float maxAllowableAngle = 30;
+  const float maxAllowableAngle = 90;
   const float maxAllowableDistanceInInches = 60;
   const float minAllowableDrivePower = 0.1; // Motor will burn up if we drive at less than 10%.
   float normalizedAnglePercentage;
@@ -94,9 +94,9 @@ void loop() {
 
   if(trackingLine()){
     if(lineAngle() < (-1 * maxAllowableAngle)){
-      normalizedAnglePercentage = 1;
+      normalizedAnglePercentage = 0.5;
     } else if (lineAngle() > maxAllowableAngle) {
-      normalizedAnglePercentage = -1;
+      normalizedAnglePercentage = -0.5;
     } else{
       normalizedAnglePercentage = lineAngle() / maxAllowableAngle;
     }
@@ -111,7 +111,7 @@ void loop() {
     trustMe = 'g';
 
   } else if(trackingTarget()){
-    Serial.println("Tracking target");
+    //Serial.println("Tracking target");
     if(targetAngle() < (-1 * maxAllowableAngle)){
       normalizedAnglePercentage = 1;
     } else if (targetAngle() > maxAllowableAngle) {
@@ -120,9 +120,9 @@ void loop() {
       normalizedAnglePercentage = targetAngle() / maxAllowableAngle;
     }
 
-  Serial.print("Target Data: ");
-  Serial.println(targetAngle());
-  Serial.println(targetStrafe());
+  //Serial.print("Target Data: ");
+  //Serial.println(targetAngle());
+  //Serial.println(targetStrafe());
     
     rotatePower = normalizedAnglePercentage;
     strafePower = targetStrafe() / 100;
@@ -131,13 +131,14 @@ void loop() {
 
   } else {
 
-    drivePower = 0.3;
-    strafePower = 0.4;
-    rotatePower = 0.5;
+    drivePower = 0.0;
+    strafePower = 0.0;
+    rotatePower = 0.0;
     trustMe = 'b';
     //unable to do driverAssist
   }
 
-  
-  sendTelemetryToRio(trustMe, drivePower, strafePower, rotatePower);
+  //Serial.println("Allegedly sending telemetry");
+  sendTelemetryToRio(true, drivePower, strafePower, trustMe);
+  delay(500);
 }

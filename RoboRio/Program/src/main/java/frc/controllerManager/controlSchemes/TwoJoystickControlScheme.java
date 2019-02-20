@@ -86,7 +86,7 @@ public class TwoJoystickControlScheme extends ControlScheme {
         } else if(mechanismXbox.getRawButton(LOGITECH_LEFT_BUTTON) || mechanismXbox.getRawButton(LOGITECH_RIGHT_BUTTON)) {
             cargoSystem.retractIntake(0.5);
         } else if(leftPower > deadZone) {
-            cargoSystem.intake(cargoIntakeSpeedStep(leftPower), cargoConveyorBeltSpeedStep(leftPower));
+            cargoSystem.intake(cargoIntakeSpeedStep(leftPower), 1.0);
         } else if(rightPower > deadZone) {
             cargoSystem.shoot(cargoOutputSpeedStep(rightPower));
         } else {
@@ -100,7 +100,7 @@ public class TwoJoystickControlScheme extends ControlScheme {
     }
 
     private double cargoConveyorBeltSpeedStep(double basePower) {
-        return (basePower > 0.5) ? 0.6 : 0;
+        return (basePower > 0.5) ? 0.8 : 0;
     }
 
     private double cargoOutputSpeedStep(double basePower) {
