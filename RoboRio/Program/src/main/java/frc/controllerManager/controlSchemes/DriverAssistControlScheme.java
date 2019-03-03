@@ -1,25 +1,17 @@
 package frc.controllerManager.controlSchemes;
 	
 import frc.controllerManager.ControlScheme;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.apis.Communications;
 import frc.apis.MecanumChassis;
 import frc.apis.SerialData;
 
 public class DriverAssistControlScheme extends ControlScheme {
 
-	private static final double ANALOG_MEDIAN_VOLTAGE = 2.5;
-	private static final double ANALOG_DEADZONE = 0.25;
-	private static final double MINIMUM_ANALOG = 0.05;
-	
 	private boolean finished;
-	private boolean canShoot;
 
 	private Communications communications;
 
-	//TODO: Set all of these ports to what they should be
-	private static final int DRIVER_ASSIST_CAN_BEGIN_PORT = 1;
-	private static final int DRIVER_ASSIST_FINISHED_DIGITAL_PORT = 2;
-	private static final int CAN_SHOOT_DIGITAL_PORT = 3;
 	private static final int SERIAL_PORT = 0;
 
 	private MecanumChassis chassis;
@@ -30,7 +22,6 @@ public class DriverAssistControlScheme extends ControlScheme {
 		this.chassis = chassis;
 		
 		this.finished = false;
-		this.canShoot = false;
 	}
 
 	public void start() {
@@ -53,6 +44,10 @@ public class DriverAssistControlScheme extends ControlScheme {
 			double drivePower = SerialData.parsePercentage(serialData, 'z');
 			double rotatePower = SerialData.parsePercentage(serialData, 'r');
 
+			SmartDashboard.putNumber("DriverAssist Strafe Power", strafePower);
+			SmartDashboard.putNumber("DriverAssist Drive Power", drivePower);
+			SmartDashboard.putNumber("DriverAssist Rotate Power", rotatePower);
+
 			System.out.println("Driving at " + drivePower + " " + strafePower + " " + rotatePower);
 			chassis.driveMecanum(strafePower, drivePower, rotatePower);
 		} else {
@@ -60,19 +55,6 @@ public class DriverAssistControlScheme extends ControlScheme {
 			System.out.println("Requested data has expired.");
 			//finished = true;
 		}
-
-		/*
-		chassis.driveMecanum(
-			scaleAnalogInput(communications.getAnalogPortInput(DRIVE_FORWARD_ANALOG_PORT)),
-			scaleAnalogInput(communications.getAnalogPortInput(STRAFE_ANALOG_PORT)),
-			scaleAnalogInput(communications.getAnalogPortInput(ROTATE_ANALOG_PORT)));
-
-		System.out.println("Finished port input" + communications.getDigitalPortInput(DRIVER_ASSIST_FINISHED_DIGITAL_PORT));
-		if(communications.getDigitalPortInput(DRIVER_ASSIST_FINISHED_DIGITAL_PORT)) {
-			finished = true;
-			canShoot = communications.getDigitalPortInput(CAN_SHOOT_DIGITAL_PORT);
-		}
-		*/
 
 		System.out.println("===End of Driver Assist Frame===");
 	}

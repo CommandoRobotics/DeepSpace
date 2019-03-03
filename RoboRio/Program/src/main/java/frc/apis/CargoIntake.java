@@ -1,7 +1,6 @@
 package frc.apis;
 
 import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.DigitalInput;
 
 public class CargoIntake {
 

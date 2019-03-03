@@ -1,5 +1,7 @@
 package frc.apis;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class SerialData {
 
     private String data;
@@ -36,10 +38,12 @@ public class SerialData {
             if(startCharacter(incomingChar) && numValidCharacters > 0) {
                 numValidCharacters = 0;
                 if(this.incomingData.charAt(0) == 'g') {
+                    SmartDashboard.putBoolean("DriverAssist Reliable", true);
                     data = this.incomingData.toString();
                     this.timeDataReceived = System.nanoTime();
                 } else {
                     System.out.println("Got a bad data indicator.");
+                    SmartDashboard.putBoolean("DriverAssist Reliable", false);
                 }
                 this.incomingData.setLength(0);
             }

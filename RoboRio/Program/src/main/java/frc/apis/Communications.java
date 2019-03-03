@@ -113,7 +113,7 @@ public class Communications {
 
         Set<Integer> digitalInputPorts = digitalInputs.keySet();
         for(int digitalInputPort : digitalInputPorts) {
-            SmartDashboard.putBoolean("Digital Input Port " + digitalInputPort, digitalInputs.get(digitalInputPort).get());
+            SmartDashboard.putBoolean("Limit Switch " + digitalInputPort, digitalInputs.get(digitalInputPort).get());
         }
 
         Set<Integer> serialInputPorts = serialPorts.keySet();

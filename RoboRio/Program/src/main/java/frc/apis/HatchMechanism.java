@@ -1,6 +1,7 @@
 package frc.apis;
 
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class HatchMechanism {
 
@@ -18,15 +19,15 @@ public class HatchMechanism {
     }
 
     public void deploy() {
-        solenoid1.set(false);
-        solenoid2.set(true);
+        solenoid1.set(true);
         deployed = true;
+        SmartDashboard.putBoolean("Hatch Extended", deployed);
     }
 
     public void retract() {
-        solenoid1.set(true);
-        solenoid2.set(false);
+        solenoid1.set(false);
         deployed = false;
+        SmartDashboard.putBoolean("Hatch retractex", deployed);
     }
 
     public void toggle() {

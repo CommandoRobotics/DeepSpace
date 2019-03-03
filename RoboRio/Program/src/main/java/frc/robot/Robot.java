@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation;
 
+@SuppressWarnings("unused")
 public class Robot extends TimedRobot {
   private int currentState;
   private static final int DRIVER_CONTROL_STATE = 0;
@@ -27,6 +28,7 @@ public class Robot extends TimedRobot {
   private MecanumChassis chassis;
   private HatchMechanism hatchMechanism;
   private CargoSystem cargoSystem;
+  private PDP pdp;
 
   private TwoJoystickControlScheme controlScheme;
   private DriverAssistControlScheme driverAssist;
@@ -57,8 +59,9 @@ public class Robot extends TimedRobot {
     this.chassis = new MecanumChassis(new Spark(0), new Spark(1), new Spark(3), new Spark(2));
     this.hatchMechanism = new HatchMechanism(0, 1);
     this.cargoSystem = new CargoSystem(new CargoIntake(6), new CargoConveyorBelt(4), new CargoOutput(5, 7), new ArmWinch(8), communications);
-	  
-    this.controlScheme = new TwoJoystickControlScheme(chassis, hatchMechanism, cargoSystem);//9,8,7,6
+    this.pdp = new PDP();
+    
+    this.controlScheme = new TwoJoystickControlScheme(chassis, hatchMechanism, cargoSystem);
 	  this.driverAssist = new DriverAssistControlScheme(communications, chassis);
   }
 
@@ -70,23 +73,31 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    communications.reset();
+    initializeRobot();
   }
 
   @Override
   public void autonomousPeriodic() {
-
+    updateRobot();
   }
 
   @Override
   public void teleopInit() {
-    this.currentState = DRIVER_CONTROL_STATE;
-    communications.reset();
+    initializeRobot();
   }
 
   @Override
   public void teleopPeriodic() {
-    SmartDashboard.putBoolean(" ", false);
+    updateRobot();
+  }
+
+  public void initializeRobot() {
+    this.currentState = DRIVER_CONTROL_STATE;
+    communications.reset();
+  }
+
+  public void updateRobot() {
+    pdp.updatePowerUsage();
 
     communications.update();
 
@@ -94,6 +105,7 @@ public class Robot extends TimedRobot {
 
     switch(currentState) {
       case DRIVER_CONTROL_STATE:
+        SmartDashboard.putBoolean("Driver Assist Running", false);
         if(controlScheme.driverAssistRequested()) {
           System.out.println("Driver Assist Requested");
           driverAssist.start();
@@ -102,7 +114,8 @@ public class Robot extends TimedRobot {
           controlScheme.controlRobot();
         }
         break;
-      case DRIVER_ASSIST_STATE:   
+      case DRIVER_ASSIST_STATE:
+        SmartDashboard.putBoolean("Driver Assist Running", true);
         if(driverAssist.isFinished() || controlScheme.driverAssistRequested()) {
           System.out.println("Driver Assist Stopped");
           currentState = DRIVER_CONTROL_STATE;

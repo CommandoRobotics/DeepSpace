@@ -4,14 +4,15 @@ import edu.wpi.first.wpilibj.Spark;
 
 public class ArmWinch {
 
-    private Spark wench;
+    private Spark winch;
 
     public ArmWinch(int motorPort) {
         this(new Spark(motorPort));
     }
 
-    public ArmWinch(Spark wench) {
-        this.wench = wench;
+    public ArmWinch(Spark winch) {
+        this.winch = winch;
+
     }
 
     public void update() {
@@ -19,15 +20,15 @@ public class ArmWinch {
     }
 
     public void retract(double power) {
-        wench.set(Math.abs(power));
+        winch.set(Math.abs(power));
     }
 
     public void deploy(double power) {
-        wench.set(-Math.abs(power));
+        winch.set(-Math.abs(power));
     }
 
     public void stop() {
-        wench.set(0);
+        winch.set(0);
     }
 
 }

@@ -1,6 +1,7 @@
 package frc.controllerManager.controlSchemes;
 
 import frc.apis.MecanumChassis;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.apis.CargoSystem;
 import frc.apis.HatchMechanism;
 import frc.controllerManager.ControlScheme;
@@ -56,7 +57,10 @@ public class TwoJoystickControlScheme extends ControlScheme {
 
     private void controlChassis() {
         if(!hasChassis) return;
-        if(driverXbox.buttonWasJustPressed(LOGITECH_TOP_BUTTON)) driveControlsReversed = !driveControlsReversed;
+        if(driverXbox.buttonWasJustPressed(LOGITECH_TOP_BUTTON)) {
+            driveControlsReversed = !driveControlsReversed;
+            SmartDashboard.putString("Drive Reversed", (driveControlsReversed) ? "Cargo Is Forward" : "Hatch Is Forward");
+        }
 
         double reverseFactor = driveControlsReversed ? -1 : 1;
 

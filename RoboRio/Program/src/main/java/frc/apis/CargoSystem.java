@@ -8,8 +8,6 @@ public class CargoSystem {
     private ArmWinch armWinch;
 
     private Communications communications;
-    private static final int FIRST_DIGITAL_INPUT_PORT = 1;
-    private static final int SECOND_DIGITAL_INPUT_PORT = 2;
 
     public CargoSystem(CargoIntake cargoIntake, CargoConveyorBelt cargoConveyorBelt, CargoOutput cargoOutput, ArmWinch armWinch,
         Communications communications) {
