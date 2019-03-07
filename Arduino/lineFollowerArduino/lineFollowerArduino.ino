@@ -41,6 +41,6 @@ void loop() {
   //Serial.print("%");
   Serial.print("\n");
  // delay (1200);
-  updateDataForReplyToMaster(canISeeLine(), 0,0, getLineReference());
+  //updateDataForReplyToMaster(canISeeLine(), 0,0, getLineReference());
 //  updateDataForReplyToMaster(canISeeLine(), 0,0, 8);
 }
