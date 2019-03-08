@@ -26,6 +26,14 @@ public class CargoSystem {
         armWinch.update();
     }
 
+    public void holdIntakeArm() {
+        cargoIntake.hold();
+    }
+
+    public void releaseIntakeArm() {
+        cargoIntake.release();
+    }
+
     public void deployIntake(double power) {
         armWinch.deploy(power);
     }

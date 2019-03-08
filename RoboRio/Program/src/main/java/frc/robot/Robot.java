@@ -34,9 +34,9 @@ public class Robot extends TimedRobot {
   private DriverAssistControlScheme driverAssist;
 
   private Communications communications;
-  private static final int WHICH_ALLIANCE_DIGITAL_PORT = 5;
+  private static final int WHICH_ALLIANCE_DIGITAL_PORT = 2;
 
-  private boolean onBlueAlliance;
+  private boolean onRedAlliance;
   private boolean background;
 
   @Override
@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
     this.currentState = DRIVER_CONTROL_STATE;
     camera = CameraServer.getInstance().startAutomaticCapture(0);
 
-    onBlueAlliance = false;
+    onRedAlliance = false;
 	  
     background = true;
     SmartDashboard.putBoolean(" ", background);
@@ -52,13 +52,13 @@ public class Robot extends TimedRobot {
     this.communications = new Communications(
       new int[]{0, 1},
       new int[]{},
-      new int[]{0, 1, 2},
-      new int[]{3, WHICH_ALLIANCE_DIGITAL_PORT},
+      new int[]{0, 1, 3},
+      new int[]{WHICH_ALLIANCE_DIGITAL_PORT},
       new int[]{0});
 
     this.chassis = new MecanumChassis(new Spark(0), new Spark(1), new Spark(3), new Spark(2));
-    this.hatchMechanism = new HatchMechanism(0, 1);
-    this.cargoSystem = new CargoSystem(new CargoIntake(6), new CargoConveyorBelt(4), new CargoOutput(5, 7), new ArmWinch(8), communications);
+    this.hatchMechanism = new HatchMechanism(1);
+    this.cargoSystem = new CargoSystem(new CargoIntake(6, 0, communications), new CargoConveyorBelt(4), new CargoOutput(5, 7), new ArmWinch(8), communications);
     this.pdp = new PDP();
     
     this.controlScheme = new TwoJoystickControlScheme(chassis, hatchMechanism, cargoSystem);
@@ -67,8 +67,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    onBlueAlliance = (DriverStation.getInstance().getAlliance() == DriverStation.Alliance.Blue);
-    communications.sendDigitalPortOutput(WHICH_ALLIANCE_DIGITAL_PORT, onBlueAlliance);
+    onRedAlliance = (DriverStation.getInstance().getAlliance() == DriverStation.Alliance.Red);
+    communications.sendDigitalPortOutput(WHICH_ALLIANCE_DIGITAL_PORT, onRedAlliance);
   }
 
   @Override
