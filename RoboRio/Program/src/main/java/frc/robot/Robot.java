@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
   private DriverAssistControlScheme driverAssist;
 
   private Communications communications;
-  private static final int WHICH_ALLIANCE_DIGITAL_PORT = 5;
+  private static final int WHICH_ALLIANCE_DIGITAL_PORT = 2;
 
   private boolean onBlueAlliance;
   private boolean background;
