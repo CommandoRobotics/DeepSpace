@@ -20,11 +20,11 @@ public class ArmWinch {
     }
 
     public void retract(double power) {
-        winch.set(Math.abs(power));
+        winch.set(-Math.abs(power));
     }
 
     public void deploy(double power) {
-        winch.set(-Math.abs(power));
+        winch.set(Math.abs(power));
     }
 
     public void stop() {
