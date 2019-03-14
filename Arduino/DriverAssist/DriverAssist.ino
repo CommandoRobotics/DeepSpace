@@ -82,7 +82,7 @@ void loop() {
   float drivePower = 0.0;
   float strafePower = 0.0;
   float rotatePower = 0.0;
-  const float maxAllowableAngle = 90;
+  const float maxAllowableAngle = 50;
   const float maxAllowableDistanceInInches = 60;
   const float minAllowableDrivePower = 0.1; // Motor will burn up if we drive at less than 10%.
   float normalizedAnglePercentage;
@@ -139,6 +139,6 @@ void loop() {
   }
 
   //Serial.println("Allegedly sending telemetry");
-  sendTelemetryToRio(true, drivePower, strafePower, trustMe);
+  sendTelemetryToRio((trustMe == 'g'), drivePower, strafePower, rotatePower);
   delay(500);
 }

@@ -53,12 +53,12 @@ public class CargoIntake {
 
     public void pullCargo(double power) {
         double truePower = (Math.abs(power) > minimumPower) ? power : minimumPower;
-        motor.set(Math.abs(truePower));
+        motor.set(-Math.abs(truePower));
     }
 
     public void pushCargo(double power) {
         double truePower = (Math.abs(power) > minimumPower) ? power : -minimumPower;
-        motor.set(-Math.abs(truePower));
+        motor.set(Math.abs(truePower));
     }
 
     public void hold() {

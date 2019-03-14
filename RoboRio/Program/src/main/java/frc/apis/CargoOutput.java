@@ -25,14 +25,14 @@ public class CargoOutput {
 
     public void pullCargo(double power) {
         double truePower = (Math.abs(power) > minimumPower) ? power : minimumPower;
-        leftSpark.set(Math.abs(truePower));
-        rightSpark.set(Math.abs(truePower));
+        leftSpark.set(-Math.abs(truePower));
+        rightSpark.set(-Math.abs(truePower));
     }
 
     public void pushCargo(double power) {
         double truePower = (Math.abs(power) > minimumPower) ? power : -minimumPower;
-        leftSpark.set(-Math.abs(truePower));
-        rightSpark.set(-Math.abs(truePower));
+        leftSpark.set(Math.abs(truePower));
+        rightSpark.set(Math.abs(truePower));
     }
 
     public void stop() {

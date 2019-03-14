@@ -95,11 +95,14 @@ public class TwoJoystickControlScheme extends ControlScheme {
             cargoSystem.deployIntake(0.5);
         } else if(mechanismXbox.getRawButton(LOGITECH_LEFT_BUTTON) || mechanismXbox.getRawButton(LOGITECH_RIGHT_BUTTON)) {
             cargoSystem.retractIntake(1.0);
-        } else if(leftPower > deadZone
-        ) {
+        } else if(leftPower > deadZone) {
             cargoSystem.intake(cargoIntakeSpeedStep(leftPower), 1.0);
         } else if(rightPower > deadZone) {
             cargoSystem.shoot(cargoOutputSpeedStep(rightPower));
+        } else if(Math.abs(mechanismXbox.getRawAxis(LOGITECH_Y_AXIS_1)) > deadZone) {
+            cargoSystem.setCargoOutput(Math.abs(mechanismXbox.getRawAxis(LOGITECH_Y_AXIS_1)));
+        } else if(Math.abs(mechanismXbox.getRawAxis(LOGITECH_Y_AXIS_2)) > deadZone) {
+            cargoSystem.setConveyorBelt(-mechanismXbox.getRawAxis(LOGITECH_Y_AXIS_2));
         } else {
             cargoSystem.stop();
         }
@@ -115,12 +118,11 @@ public class TwoJoystickControlScheme extends ControlScheme {
     }
 
     private double cargoOutputSpeedStep(double basePower) {
-        return (basePower > 0.5) ? 0.5 : 0;
+        return (basePower > 0.5) ? 0.55 : 0;
     }
 
     public boolean driverAssistRequested() {
-        // return driverXbox.buttonWasJustPressed(LOGITECH_BOTTOM_BUTTON);
-        return false;
+        return driverXbox.buttonWasJustPressed(LOGITECH_BOTTOM_BUTTON);
 	}
 
 }
