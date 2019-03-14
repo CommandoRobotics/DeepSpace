@@ -168,4 +168,7 @@ void loop() {
   Serial.println(rotatePower);
   Serial.println("Allegedly sending telemetry");
   sendTelemetryToRio(trustMe, drivePower, strafePower, rotatePower);
+  //Serial.println("Allegedly sending telemetry");
+  sendTelemetryToRio((trustMe == 'g'), drivePower, strafePower, rotatePower);
+  delay(500);
 }

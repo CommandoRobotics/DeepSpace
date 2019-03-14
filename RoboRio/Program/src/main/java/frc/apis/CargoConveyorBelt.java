@@ -28,7 +28,7 @@ public class CargoConveyorBelt {
     }
 
     public void pushCargo(double power) {
-        double truePower = (Math.abs(power) > minimumPower) ? power : -minimumPower;
+        double truePower = (Math.abs(power) > minimumPower) ? power : minimumPower;
         motor.set(-Math.abs(truePower));
     }
 
