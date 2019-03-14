@@ -45,7 +45,7 @@ public class CargoSystem {
     public void expelAllContents(double power) {
         power = Math.abs(power);
         setIntake(-power);
-        setConveyorBelt(power);
+        setConveyorBelt(-power);
         setCargoOutput(-power);
         armWinch.stop();
     }
@@ -53,11 +53,11 @@ public class CargoSystem {
     public void intake(double intakePower, double conveyorBeltPower) {
         intakePower = Math.abs(intakePower);
         conveyorBeltPower = Math.abs(conveyorBeltPower);
-        setIntake(-intakePower);
+        setIntake(intakePower);
         setConveyorBelt(conveyorBeltPower);
         System.out.println("Cargo Digital Ports: " + communications.getDigitalPortInput(0) + " " + !communications.getDigitalPortInput(1));
         if(communications.getDigitalPortInput(0) && !communications.getDigitalPortInput(1)) {
-            setCargoOutput(-0.50);
+            setCargoOutput(-0.35);
         } else if(!communications.getDigitalPortInput(1)) {
             setCargoOutput(-0.15);
         } else {
@@ -69,7 +69,7 @@ public class CargoSystem {
     public void shoot(double power) {
         power = Math.abs(power);
         setIntake(0);
-        setConveyorBelt(0);
+        setConveyorBelt(0.50);
         setCargoOutput(-power);
         armWinch.stop();
     }

@@ -61,7 +61,8 @@ public class Robot extends TimedRobot {
     this.cargoSystem = new CargoSystem(new CargoIntake(6, 0, communications), new CargoConveyorBelt(4), new CargoOutput(5, 7), new ArmWinch(8), communications);
     this.pdp = new PDP();
     
-    this.controlScheme = new TwoJoystickControlScheme(chassis, hatchMechanism, cargoSystem);
+    // this.controlScheme = new TwoJoystickControlScheme(chassis, hatchMechanism, cargoSystem);
+    this.controlScheme = new TwoJoystickControlScheme(null, null, null);
 	  this.driverAssist = new DriverAssistControlScheme(communications, chassis);
   }
 
