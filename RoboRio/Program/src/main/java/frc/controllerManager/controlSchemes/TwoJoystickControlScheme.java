@@ -27,8 +27,24 @@ public class TwoJoystickControlScheme extends ControlScheme {
 
     private static double deadZone = 0.05;
 
-    private static final int WINCH_RETRACT_BUTTON = -1;
-    private static final int EXPEL_ALL_CONTENTS_BUTTON = -1;
+    //DRIVER CONTROLS
+    private static final int STRAFE_AXIS = LOGITECH_X_AXIS_1;
+    private static final int DRIVE_AXIS = LOGITECH_Y_AXIS_1;
+    private static final int ROTATE_AXIS = LOGITECH_X_AXIS_2;
+
+    private static final int DRIVER_ASSIST_BUTTON = LOGITECH_TOP_BUTTON;
+
+    //MECHANISM CONTROLS
+    private static final int HATCH_DEPLOY_BUTTON = LOGITECH_LEFT_BUMPER;
+
+    private static final int CARGO_INTAKE_BUTTON = LOGITECH_LEFT_TRIGGER;
+    private static final int CARGO_SHOOT_BUTTON = LOGITECH_RIGHT_TRIGGER;
+    private static final int CARGO_INTAKE_DEPLOY_BUTTON = LOGITECH_BOTTOM_BUTTON;
+    private static final int CARGO_INTAKE_RETRACT_BUTTON_1 = LOGITECH_LEFT_BUTTON;
+    private static final int CARGO_INTAKE_RETRACT_BUTTON_2 = LOGITECH_RIGHT_BUTTON;
+    private static final int CARGO_EXPEL_BUTTON = LOGITECH_TOP_BUTTON;
+    private static final int CARGO_CONVEYOR_BELT_AXIS = LOGITECH_Y_AXIS_2;
+    private static final int CARGO_SHOOTER_AXIS = LOGITECH_Y_AXIS_1;
 
     public TwoJoystickControlScheme(MecanumChassis chassis, HatchMechanism hatchMechanism,
         CargoSystem cargoSystem) {
@@ -60,7 +76,7 @@ public class TwoJoystickControlScheme extends ControlScheme {
 
     private void controlChassis() {
         if(!hasChassis) return;
-        if(driverXbox.buttonWasJustPressed(LOGITECH_TOP_BUTTON)) {
+        if(driverXbox.buttonWasJustPressed(DRIVER_ASSIST_BUTTON)) {
             driveControlsReversed = !driveControlsReversed;
             SmartDashboard.putString("Drive Reversed", (driveControlsReversed) ? "Cargo Is Forward" : "Hatch Is Forward");
         }
@@ -68,9 +84,9 @@ public class TwoJoystickControlScheme extends ControlScheme {
         double reverseFactor = driveControlsReversed ? -1 : 1;
 
         chassis.driveMecanum(
-            driverXbox.getRawAxis(LOGITECH_X_AXIS_1) * reverseFactor,
-            -driverXbox.getRawAxis(LOGITECH_Y_AXIS_1) * reverseFactor,
-            driverXbox.getRawAxis(LOGITECH_X_AXIS_2));
+            driverXbox.getRawAxis(STRAFE_AXIS) * reverseFactor,
+            -driverXbox.getRawAxis(DRIVE_AXIS) * reverseFactor,
+            driverXbox.getRawAxis(ROTATE_AXIS));
     }
 
     private void controlHatchMechanism() {
@@ -79,30 +95,30 @@ public class TwoJoystickControlScheme extends ControlScheme {
         if(mechanismXbox.getPOV() == 180) cargoSystem.releaseIntakeArm();
         else if(mechanismXbox.getPOV() == 0) cargoSystem.holdIntakeArm();
 
-        if(mechanismXbox.getRawButton(LOGITECH_LEFT_BUMPER)) hatchMechanism.deploy();
+        if(mechanismXbox.getRawButton(HATCH_DEPLOY_BUTTON)) hatchMechanism.deploy();
         else hatchMechanism.retract();
     }
 
     private void controlCargoSystem() {
         if(!hasCargoSystem) return;
 
-        double leftPower = mechanismXbox.getRawAxis(LOGITECH_LEFT_TRIGGER),
-            rightPower = mechanismXbox.getRawAxis(LOGITECH_RIGHT_TRIGGER);
+        double leftPower = mechanismXbox.getRawAxis(CARGO_INTAKE_BUTTON),
+            rightPower = mechanismXbox.getRawAxis(CARGO_SHOOT_BUTTON);
 
-        if(mechanismXbox.getRawButton(LOGITECH_TOP_BUTTON)) {
+        if(mechanismXbox.getRawButton(CARGO_EXPEL_BUTTON)) {
             cargoSystem.expelAllContents(0.5);
-        } else if(mechanismXbox.getRawButton(LOGITECH_BOTTOM_BUTTON)) {
+        } else if(mechanismXbox.getRawButton(CARGO_INTAKE_DEPLOY_BUTTON)) {
             cargoSystem.deployIntake(0.5);
-        } else if(mechanismXbox.getRawButton(LOGITECH_LEFT_BUTTON) || mechanismXbox.getRawButton(LOGITECH_RIGHT_BUTTON)) {
+        } else if(mechanismXbox.getRawButton(CARGO_INTAKE_RETRACT_BUTTON_1) || mechanismXbox.getRawButton(CARGO_INTAKE_RETRACT_BUTTON_2)) {
             cargoSystem.retractIntake(1.0);
         } else if(leftPower > deadZone) {
             cargoSystem.intake(cargoIntakeSpeedStep(leftPower), 1.0);
         } else if(rightPower > deadZone) {
             cargoSystem.shoot(cargoOutputSpeedStep(rightPower));
-        } else if(Math.abs(mechanismXbox.getRawAxis(LOGITECH_Y_AXIS_1)) > deadZone) {
-            cargoSystem.setCargoOutput(Math.abs(mechanismXbox.getRawAxis(LOGITECH_Y_AXIS_1)));
-        } else if(Math.abs(mechanismXbox.getRawAxis(LOGITECH_Y_AXIS_2)) > deadZone) {
-            cargoSystem.setConveyorBelt(-mechanismXbox.getRawAxis(LOGITECH_Y_AXIS_2));
+        } else if(Math.abs(mechanismXbox.getRawAxis(CARGO_SHOOTER_AXIS)) > deadZone) {
+            cargoSystem.setCargoOutput(Math.abs(mechanismXbox.getRawAxis(CARGO_SHOOTER_AXIS)));
+        } else if(Math.abs(mechanismXbox.getRawAxis(CARGO_CONVEYOR_BELT_AXIS)) > deadZone) {
+            cargoSystem.setConveyorBelt(-mechanismXbox.getRawAxis(CARGO_CONVEYOR_BELT_AXIS));
         } else {
             cargoSystem.stop();
         }
