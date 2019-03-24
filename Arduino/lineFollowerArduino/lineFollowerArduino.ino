@@ -24,7 +24,7 @@ float getLineReference() {
 
 void setupPixyCam(){
   pixy2.init();
-  pixy2.setLED(255, 255, 255);
+  pixy2.setLamp(4,1);
 }
 
 void setup() {
@@ -42,5 +42,4 @@ void loop() {
   Serial.print("\n");
  // delay (1200);
   updateDataForReplyToMaster(canISeeLine(), 0,0, getLineReference());
-//  updateDataForReplyToMaster(canISeeLine(), 0,0, 8);
 }
