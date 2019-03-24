@@ -98,6 +98,7 @@ int getDistance() {
   if (center > 255) {
     center = 255;
   }
+
   return center;
 }
 

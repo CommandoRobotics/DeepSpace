@@ -81,6 +81,7 @@ void sendTelemetryToRio(bool trustMe, double forward_percentage, double right_st
       char send_buffer[buffer_length] = {0}; // The zero in curly braces initializes the array to zero.
 
       if (trustMe) {
+        Serial.print("We can trust this data.\n");
         int bytes_written = 0;
         send_buffer[bytes_written] = 'g';
         bytes_written += 1;
@@ -97,6 +98,7 @@ void sendTelemetryToRio(bool trustMe, double forward_percentage, double right_st
         Serial.write("\n");
 
       } else {
+        Serial.print("We cannot trust this data.\n");
         send_buffer[0] = 'b';
         send_buffer[1] = '\n';
         Serial.write(send_buffer, 2);

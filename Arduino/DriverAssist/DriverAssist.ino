@@ -7,10 +7,8 @@ masterCommunicationToSlave lineSlave(11);
 masterCommunicationToSlave ultrasonicSlave(12);
 
 bool trackingLine() {
-  if (lineSlave.canSlaveBeTrusted() && ultrasonicSlave.canSlaveBeTrusted()) {
-    return true;
-  }
   return false;
+//  return (lineSlave.canSlaveBeTrusted() && ultrasonicSlave.canSlaveBeTrusted());
 }
 
 float lineAngle() {
@@ -26,7 +24,10 @@ float lineStrafe() {
 }
 
 bool trackingTarget() {
-  return targetSlave.canSlaveBeTrusted();
+  bool tracking = targetSlave.canSlaveBeTrusted();
+  Serial.print("Target trustworthy? ");
+  Serial.println(tracking);
+  return tracking;
 }
 
 float targetAngle() {
@@ -63,10 +64,11 @@ void commandRio(float angle, float strafe, float distance) {
 
 void setup() {
   //setupCommunications();
+  Serial.begin(9600);
+  
   targetSlave.setup();
   lineSlave.setup();
   ultrasonicSlave.setup();
-  Serial.begin(9600);
 }
 
 float angleToRotationPower(float angle) {
@@ -78,13 +80,16 @@ float distanceToDrivePower(float distanceInInches) {
 }
 
 
+const float maxAllowableAngle = 50;
+const float maxAllowableDistanceInInches = 60;
+const float minAllowableDrivePower = 0.1; // Motor will burn up if we drive at less than 10%.
+const float maxAllowableRotatePower = 0.5;
+
 void loop() {
   float drivePower = 0.0;
   float strafePower = 0.0;
   float rotatePower = 0.0;
-  const float maxAllowableAngle = 50;
-  const float maxAllowableDistanceInInches = 60;
-  const float minAllowableDrivePower = 0.1; // Motor will burn up if we drive at less than 10%.
+  
   float normalizedAnglePercentage;
   char trustMe = 'b';
 
@@ -95,35 +100,48 @@ void loop() {
   if(trackingLine()){
     Serial.print("Tracking line\n");
 
-  float storedLineAngle = lineAngle();
-
-  Serial.print("Line Angle: ");
-      Serial.print(storedLineAngle);
-      Serial.print("\n");
+    float storedLineAngle = lineAngle();
+  
+    Serial.print("Line Angle: ");
+      Serial.println(storedLineAngle);
     
     if(storedLineAngle < -maxAllowableAngle){
-      Serial.print("Line angle more negative than maxAllowableAngle\n");
       normalizedAnglePercentage = 0.5;
     } else if (storedLineAngle > maxAllowableAngle) {
-      Serial.print("Line angle more positive than maxAllowableAngle\n");
       normalizedAnglePercentage = -0.5;
     } else{
-      Serial.print("Line angle in range");
       normalizedAnglePercentage = (storedLineAngle / maxAllowableAngle) * 0.5;
     }
-
+    
     rotatePower = normalizedAnglePercentage;
     strafePower = lineStrafe();
 
-    float distanceScalePercentage = lineDistance() / 12;
+    Serial.print("Rotate Power: ");
+    Serial.println(rotatePower);
+    Serial.print("Strafe Power: ");
+    Serial.println(strafePower);
+
+    float distanceFromLine = lineDistance();
+
+    Serial.print("Line Distance: ");
+    Serial.println(distanceFromLine);
+
+    float distanceScalePercentage = distanceFromLine / 12;
 
     if(distanceScalePercentage > 1){
       distanceScalePercentage = 1;
     } else if(distanceScalePercentage < 0.25){
       distanceScalePercentage = 0.25;
     }
+
+    Serial.print("Distance Scale Percentage: ");
+    Serial.println(distanceScalePercentage);
     
     drivePower = (1 - (abs(strafePower) + abs(rotatePower))) * distanceScalePercentage;
+
+    Serial.print("Drive Power");
+    Serial.println(drivePower);
+    
     if (drivePower < minAllowableDrivePower) {
       drivePower = 0;
     }
@@ -147,8 +165,19 @@ void loop() {
   //Serial.println(targetStrafe());
     
     rotatePower = normalizedAnglePercentage;
-    strafePower = targetStrafe() / 100;
-    drivePower = (1 - (abs(strafePower) + abs(rotatePower))) * targetDistance();
+    strafePower = targetStrafe();
+
+    float distanceFromTarget = targetDistance();
+
+    float distanceScalePercentage = distanceFromTarget / 12;
+
+    if(distanceScalePercentage > 1){
+      distanceScalePercentage = 1;
+    } else if(distanceScalePercentage < 0.25){
+      distanceScalePercentage = 0.25;
+    }
+    
+    drivePower = (0.75 - (abs(strafePower) + abs(rotatePower))) * distanceScalePercentage;
     trustMe = 'g';
 
   } else {
@@ -159,16 +188,11 @@ void loop() {
     trustMe = 'b';
     //unable to do driverAssist
   }
-
-  Serial.print("Drive Power: ");
-  Serial.println(drivePower);
-  Serial.print("Strafe Power: ");
-  Serial.println(strafePower);
-  Serial.print("Rotate Power: ");
-  Serial.println(rotatePower);
-  Serial.println("Allegedly sending telemetry");
-  sendTelemetryToRio(trustMe, drivePower, strafePower, rotatePower);
+  
   //Serial.println("Allegedly sending telemetry");
-  sendTelemetryToRio((trustMe == 'g'), drivePower, strafePower, rotatePower);
+  
+  bool trustArduino = trustMe == 'g';
+  
+  sendTelemetryToRio(trustArduino, drivePower, strafePower, rotatePower);
   delay(500);
 }

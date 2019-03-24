@@ -9,7 +9,7 @@ Pixy2 pixy2;
 float lineLocation; 
 
 bool canISeeLine() {
-  return true;
+  return pixy2.ccc.getBlocks() == 1;
 }
 
 float getLineReference() {
@@ -28,19 +28,17 @@ void setupPixyCam(){
 }
 
 void setup() {
-  Serial.begin(1200);
+  Serial.begin(9600);
   setupVisionCommunications(11);
   setupPixyCam();
-  Wire.begin(11);
 }
 
 //print
 void loop() {
-  double strafingPercentage = 100;
+  Serial.print(canISeeLine());
+  Serial.print(" -- ");
   Serial.print(getLineReference());
-  //Serial.print("%");
   Serial.print("\n");
- // delay (1200);
   updateDataForReplyToMaster(canISeeLine(), 0,0, getLineReference());
 //  updateDataForReplyToMaster(canISeeLine(), 0,0, 8);
 }

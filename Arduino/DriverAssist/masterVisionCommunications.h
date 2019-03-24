@@ -34,7 +34,6 @@ public:
             if (Wire.available()) {
                 transmissionBuffer[i] = Wire.read();
             } else {
-                Serial.println("Could not find wire");
                 slaveInfo.isTrustworthy = false;
                 return false;
             }
