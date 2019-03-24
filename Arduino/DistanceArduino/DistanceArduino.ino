@@ -110,7 +110,7 @@ double getRotationInDegrees() {
   double disBetweenSensors = 10; //Believe it or not this is the distance between the sensors on the robot
   double angleInRadians = atan(abs(left-right)/(disBetweenSensors)); //returns angle to be parallel
   if (left < right) {
-    return abs(convertToDegrees(angleInRadians));
+    return -abs(convertToDegrees(angleInRadians));
   } else if (right < left) {
     return abs(convertToDegrees(angleInRadians));
   } else if (right == left) {

@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation;
 
+@SuppressWarnings("unused")
 public class Robot extends TimedRobot {
   private int currentState;
   private static final int DRIVER_CONTROL_STATE = 0;
@@ -27,14 +28,15 @@ public class Robot extends TimedRobot {
   private MecanumChassis chassis;
   private HatchMechanism hatchMechanism;
   private CargoSystem cargoSystem;
+  private PDP pdp;
 
   private TwoJoystickControlScheme controlScheme;
   private DriverAssistControlScheme driverAssist;
 
   private Communications communications;
-  private static final int WHICH_ALLIANCE_DIGITAL_PORT = 5;
+  private static final int WHICH_ALLIANCE_DIGITAL_PORT = 2;
 
-  private boolean onBlueAlliance;
+  private boolean onRedAlliance;
   private boolean background;
 
   @Override
@@ -42,7 +44,7 @@ public class Robot extends TimedRobot {
     this.currentState = DRIVER_CONTROL_STATE;
     camera = CameraServer.getInstance().startAutomaticCapture(0);
 
-    onBlueAlliance = false;
+    onRedAlliance = false;
 	  
     background = true;
     SmartDashboard.putBoolean(" ", background);
@@ -50,43 +52,53 @@ public class Robot extends TimedRobot {
     this.communications = new Communications(
       new int[]{0, 1},
       new int[]{},
-      new int[]{1, 2},
-      new int[]{3, WHICH_ALLIANCE_DIGITAL_PORT},
+      new int[]{0, 1, 3},
+      new int[]{WHICH_ALLIANCE_DIGITAL_PORT},
       new int[]{0});
 
     this.chassis = new MecanumChassis(new Spark(0), new Spark(1), new Spark(3), new Spark(2));
-    this.hatchMechanism = new HatchMechanism(0, 1);
-    this.cargoSystem = new CargoSystem(new CargoIntake(6), new CargoConveyorBelt(4), new CargoOutput(5, 7), communications);
-	  
-    this.controlScheme = new TwoJoystickControlScheme(chassis, hatchMechanism, cargoSystem);//9,8,7,6
+    this.hatchMechanism = new HatchMechanism(1);
+    this.cargoSystem = new CargoSystem(new CargoIntake(6, 0, communications), new CargoConveyorBelt(4), new CargoOutput(5, 7), new ArmWinch(8), communications);
+    this.pdp = new PDP();
+    
+    // this.controlScheme = new TwoJoystickControlScheme(chassis, hatchMechanism, cargoSystem);
+    this.controlScheme = new TwoJoystickControlScheme(null, null, null);
 	  this.driverAssist = new DriverAssistControlScheme(communications, chassis);
   }
 
   @Override
   public void robotPeriodic() {
-    onBlueAlliance = (DriverStation.getInstance().getAlliance() == DriverStation.Alliance.Blue);
-    communications.sendDigitalPortOutput(WHICH_ALLIANCE_DIGITAL_PORT, onBlueAlliance);
+    onRedAlliance = (DriverStation.getInstance().getAlliance() == DriverStation.Alliance.Red);
+    communications.sendDigitalPortOutput(WHICH_ALLIANCE_DIGITAL_PORT, onRedAlliance);
   }
 
   @Override
   public void autonomousInit() {
-    communications.reset();
+    initializeRobot();
   }
 
   @Override
   public void autonomousPeriodic() {
-
+    updateRobot();
   }
 
   @Override
   public void teleopInit() {
-    this.currentState = DRIVER_CONTROL_STATE;
-    communications.reset();
+    initializeRobot();
   }
 
   @Override
   public void teleopPeriodic() {
-    SmartDashboard.putBoolean(" ", driverAssist.canBegin());
+    updateRobot();
+  }
+
+  public void initializeRobot() {
+    this.currentState = DRIVER_CONTROL_STATE;
+    communications.reset();
+  }
+
+  public void updateRobot() {
+    pdp.updatePowerUsage();
 
     communications.update();
 
@@ -94,6 +106,7 @@ public class Robot extends TimedRobot {
 
     switch(currentState) {
       case DRIVER_CONTROL_STATE:
+        SmartDashboard.putBoolean("Driver Assist Running", false);
         if(controlScheme.driverAssistRequested()) {
           System.out.println("Driver Assist Requested");
           driverAssist.start();
@@ -102,7 +115,8 @@ public class Robot extends TimedRobot {
           controlScheme.controlRobot();
         }
         break;
-      case DRIVER_ASSIST_STATE:   
+      case DRIVER_ASSIST_STATE:
+        SmartDashboard.putBoolean("Driver Assist Running", true);
         if(driverAssist.isFinished() || controlScheme.driverAssistRequested()) {
           System.out.println("Driver Assist Stopped");
           currentState = DRIVER_CONTROL_STATE;

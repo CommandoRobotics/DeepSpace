@@ -5,15 +5,17 @@ public class CargoSystem {
     private CargoIntake cargoIntake;
     private CargoConveyorBelt cargoConveyorBelt;
     private CargoOutput cargoOutput;
+    private ArmWinch armWinch;
 
     private Communications communications;
-    private static final int FIRST_DIGITAL_INPUT_PORT = 1;
-    private static final int SECOND_DIGITAL_INPUT_PORT = 2;
 
-    public CargoSystem(CargoIntake cargoIntake, CargoConveyorBelt cargoConveyorBelt, CargoOutput cargoOutput, Communications communications) {
+    public CargoSystem(CargoIntake cargoIntake, CargoConveyorBelt cargoConveyorBelt, CargoOutput cargoOutput, ArmWinch armWinch,
+        Communications communications) {
         this.cargoIntake = cargoIntake;
         this.cargoConveyorBelt = cargoConveyorBelt;
         this.cargoOutput = cargoOutput;
+        this.armWinch = armWinch;
+
         this.communications = communications;
     }
 
@@ -21,33 +23,55 @@ public class CargoSystem {
         cargoIntake.update();
         cargoConveyorBelt.update();
         cargoOutput.update();
+        armWinch.update();
+    }
+
+    public void holdIntakeArm() {
+        cargoIntake.hold();
+    }
+
+    public void releaseIntakeArm() {
+        cargoIntake.release();
+    }
+
+    public void deployIntake(double power) {
+        armWinch.deploy(power);
+    }
+
+    public void retractIntake(double power) {
+        armWinch.retract(power);
     }
 
     public void expelAllContents(double power) {
         power = Math.abs(power);
-        setIntake(power);
-        setConveyorBelt(power);
-        setCargoOutput(power);
-    }
-
-    public void intake(double power) {
-        power = Math.abs(power);
         setIntake(-power);
         setConveyorBelt(-power);
-        setCargoOutput(0);
+        setCargoOutput(-power);
+        armWinch.stop();
     }
 
     public void intake(double intakePower, double conveyorBeltPower) {
-        setIntake(-Math.abs(intakePower));
-        setConveyorBelt(-Math.abs(conveyorBeltPower));
-        setCargoOutput(0);
+        intakePower = Math.abs(intakePower);
+        conveyorBeltPower = Math.abs(conveyorBeltPower);
+        setIntake(intakePower);
+        setConveyorBelt(conveyorBeltPower);
+        System.out.println("Cargo Digital Ports: " + communications.getDigitalPortInput(0) + " " + !communications.getDigitalPortInput(1));
+        if(communications.getDigitalPortInput(0) && !communications.getDigitalPortInput(1)) {
+            setCargoOutput(-0.35);
+        } else if(!communications.getDigitalPortInput(1)) {
+            setCargoOutput(-0.15);
+        } else {
+            setCargoOutput(0);
+        }
+        armWinch.stop();
     }
 
     public void shoot(double power) {
         power = Math.abs(power);
         setIntake(0);
-        setConveyorBelt(0);
+        setConveyorBelt(0.50);
         setCargoOutput(-power);
+        armWinch.stop();
     }
 
     public void setIntake(double power) {
@@ -69,6 +93,7 @@ public class CargoSystem {
         cargoIntake.stop();
         cargoConveyorBelt.stop();
         cargoOutput.stop();
+        armWinch.stop();
     }
 
 }

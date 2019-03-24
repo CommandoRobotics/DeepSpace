@@ -1,6 +1,6 @@
 #include "masterVisionCommunications.h"
 #include "rioCommunications.h"
-//#include "sensorsAPI.h"
+//#include "sensorsAPI.h
 
 masterCommunicationToSlave targetSlave(8);
 masterCommunicationToSlave lineSlave(11);
@@ -82,7 +82,7 @@ void loop() {
   float drivePower = 0.0;
   float strafePower = 0.0;
   float rotatePower = 0.0;
-  const float maxAllowableAngle = 30;
+  const float maxAllowableAngle = 50;
   const float maxAllowableDistanceInInches = 60;
   const float minAllowableDrivePower = 0.1; // Motor will burn up if we drive at less than 10%.
   float normalizedAnglePercentage;
@@ -92,26 +92,48 @@ void loop() {
   lineSlave.update();
   ultrasonicSlave.update();
 
-  /*if(trackingLine()){
-    if(lineAngle() < (-1 * maxAllowableAngle)){
-      normalizedAnglePercentage = 1;
-    } else if (lineAngle() > maxAllowableAngle) {
-      normalizedAnglePercentage = -1;
+  if(trackingLine()){
+    Serial.print("Tracking line\n");
+
+  float storedLineAngle = lineAngle();
+
+  Serial.print("Line Angle: ");
+      Serial.print(storedLineAngle);
+      Serial.print("\n");
+    
+    if(storedLineAngle < -maxAllowableAngle){
+      Serial.print("Line angle more negative than maxAllowableAngle\n");
+      normalizedAnglePercentage = 0.5;
+    } else if (storedLineAngle > maxAllowableAngle) {
+      Serial.print("Line angle more positive than maxAllowableAngle\n");
+      normalizedAnglePercentage = -0.5;
     } else{
-      normalizedAnglePercentage = lineAngle() / maxAllowableAngle;
+      Serial.print("Line angle in range");
+      normalizedAnglePercentage = (storedLineAngle / maxAllowableAngle) * 0.5;
     }
 
     rotatePower = normalizedAnglePercentage;
     strafePower = lineStrafe();
-    drivePower = (1 - (abs(strafePower) + abs(rotatePower))) * lineDistance();
+
+    float distanceScalePercentage = lineDistance() / 12;
+
+    if(distanceScalePercentage > 1){
+      distanceScalePercentage = 1;
+    } else if(distanceScalePercentage < 0.25){
+      distanceScalePercentage = 0.25;
+    }
+    
+    drivePower = (1 - (abs(strafePower) + abs(rotatePower))) * distanceScalePercentage;
     if (drivePower < minAllowableDrivePower) {
       drivePower = 0;
     }
 
     trustMe = 'g';
 
-  } else */if(trackingTarget()){
-    Serial.println("Tracking target");
+  } else if(trackingTarget()){
+    Serial.print("Tracking target\n");
+    
+    //Serial.println("Tracking target");
     if(targetAngle() < (-1 * maxAllowableAngle)){
       normalizedAnglePercentage = 1;
     } else if (targetAngle() > maxAllowableAngle) {
@@ -120,9 +142,9 @@ void loop() {
       normalizedAnglePercentage = targetAngle() / maxAllowableAngle;
     }
 
-  Serial.print("Target Data: ");
-  Serial.println(targetAngle());
-  Serial.println(targetStrafe());
+  //Serial.print("Target Data: ");
+  //Serial.println(targetAngle());
+  //Serial.println(targetStrafe());
     
     rotatePower = normalizedAnglePercentage;
     strafePower = targetStrafe() / 100;
@@ -131,13 +153,22 @@ void loop() {
 
   } else {
 
-    drivePower = 0.3;
-    strafePower = 0.4;
-    rotatePower = 0.5;
+    drivePower = 0.0;
+    strafePower = 0.0;
+    rotatePower = 0.0;
     trustMe = 'b';
     //unable to do driverAssist
   }
 
-  
+  Serial.print("Drive Power: ");
+  Serial.println(drivePower);
+  Serial.print("Strafe Power: ");
+  Serial.println(strafePower);
+  Serial.print("Rotate Power: ");
+  Serial.println(rotatePower);
+  Serial.println("Allegedly sending telemetry");
   sendTelemetryToRio(trustMe, drivePower, strafePower, rotatePower);
+  //Serial.println("Allegedly sending telemetry");
+  sendTelemetryToRio((trustMe == 'g'), drivePower, strafePower, rotatePower);
+  delay(500);
 }

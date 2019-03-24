@@ -19,7 +19,7 @@ float getLineReference() {
   
   lineLocation = pixy2.ccc.blocks[0].m_x;
   percentage = (lineLocation - 157)/157;
-  return percentage;
+  return -percentage;
 }
 
 void setupPixyCam(){
