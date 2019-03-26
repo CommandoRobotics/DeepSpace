@@ -7,8 +7,7 @@ masterCommunicationToSlave lineSlave(11);
 masterCommunicationToSlave ultrasonicSlave(12);
 
 bool trackingLine() {
-  return false;
-//  return (lineSlave.canSlaveBeTrusted() && ultrasonicSlave.canSlaveBeTrusted());
+  return (lineSlave.canSlaveBeTrusted() && ultrasonicSlave.canSlaveBeTrusted());
 }
 
 float lineAngle() {
@@ -24,10 +23,7 @@ float lineStrafe() {
 }
 
 bool trackingTarget() {
-  bool tracking = targetSlave.canSlaveBeTrusted();
-  Serial.print("Target trustworthy? ");
-  Serial.println(tracking);
-  return tracking;
+  return targetSlave.canSlaveBeTrusted();
 }
 
 float targetAngle() {
@@ -83,7 +79,14 @@ float distanceToDrivePower(float distanceInInches) {
 const float maxAllowableAngle = 50;
 const float maxAllowableDistanceInInches = 60;
 const float minAllowableDrivePower = 0.1; // Motor will burn up if we drive at less than 10%.
-const float maxAllowableRotatePower = 0.5;
+
+const float maxAllowableDrivePower = 0.5;
+
+
+float convertToJoystickPower(float power, float maxPowerThreshold) {
+  if(power > maxPowerThreshold) return 1;
+  return power / maxPowerThreshold;
+}
 
 void loop() {
   float drivePower = 0.0;
@@ -101,9 +104,9 @@ void loop() {
     Serial.print("Tracking line\n");
 
     float storedLineAngle = lineAngle();
-  
-    Serial.print("Line Angle: ");
-      Serial.println(storedLineAngle);
+
+    Serial.print("Stored Line Angle" );
+    Serial.println(storedLineAngle);
     
     if(storedLineAngle < -maxAllowableAngle){
       normalizedAnglePercentage = 0.5;
@@ -115,32 +118,21 @@ void loop() {
     
     rotatePower = normalizedAnglePercentage;
     strafePower = lineStrafe();
-
-    Serial.print("Rotate Power: ");
-    Serial.println(rotatePower);
-    Serial.print("Strafe Power: ");
-    Serial.println(strafePower);
-
+    
     float distanceFromLine = lineDistance();
 
-    Serial.print("Line Distance: ");
-    Serial.println(distanceFromLine);
-
     float distanceScalePercentage = distanceFromLine / 12;
+
+    Serial.print("Line Strafe: ");
+    Serial.println(strafePower);
 
     if(distanceScalePercentage > 1){
       distanceScalePercentage = 1;
     } else if(distanceScalePercentage < 0.25){
       distanceScalePercentage = 0.25;
     }
-
-    Serial.print("Distance Scale Percentage: ");
-    Serial.println(distanceScalePercentage);
     
     drivePower = (1 - (abs(strafePower) + abs(rotatePower))) * distanceScalePercentage;
-
-    Serial.print("Drive Power");
-    Serial.println(drivePower);
     
     if (drivePower < minAllowableDrivePower) {
       drivePower = 0;
@@ -148,10 +140,18 @@ void loop() {
 
     trustMe = 'g';
 
+    drivePower = convertToJoystickPower(drivePower, 0.65);
+    strafePower = convertToJoystickPower(strafePower, 0.60);
+    rotatePower = convertToJoystickPower(rotatePower, 0.30);
+    
+    Serial.println(convertToJoystickPower(drivePower, 0.75));
+    Serial.println(convertToJoystickPower(strafePower, 0.60));
+    Serial.println(convertToJoystickPower(rotatePower, 0.30));
+
+
   } else if(trackingTarget()){
     Serial.print("Tracking target\n");
     
-    //Serial.println("Tracking target");
     if(targetAngle() < (-1 * maxAllowableAngle)){
       normalizedAnglePercentage = 1;
     } else if (targetAngle() > maxAllowableAngle) {
@@ -159,10 +159,6 @@ void loop() {
     } else{
       normalizedAnglePercentage = targetAngle() / maxAllowableAngle;
     }
-
-  //Serial.print("Target Data: ");
-  //Serial.println(targetAngle());
-  //Serial.println(targetStrafe());
     
     rotatePower = normalizedAnglePercentage;
     strafePower = targetStrafe();
@@ -180,6 +176,10 @@ void loop() {
     drivePower = (0.75 - (abs(strafePower) + abs(rotatePower))) * distanceScalePercentage;
     trustMe = 'g';
 
+    drivePower = convertToJoystickPower(drivePower, 0.65);
+    strafePower = convertToJoystickPower(strafePower, 0.60);
+    rotatePower = convertToJoystickPower(rotatePower, 0.30);
+
   } else {
 
     drivePower = 0.0;
@@ -189,7 +189,7 @@ void loop() {
     //unable to do driverAssist
   }
   
-  //Serial.println("Allegedly sending telemetry");
+  Serial.println("Allegedly sending telemetry");
   
   bool trustArduino = trustMe == 'g';
   

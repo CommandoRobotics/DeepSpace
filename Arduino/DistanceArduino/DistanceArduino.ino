@@ -108,7 +108,7 @@ double convertToDegrees(double r) {
 }
 
 double getRotationInDegrees() {
-  double disBetweenSensors = 10; //Believe it or not this is the distance between the sensors on the robot
+  double disBetweenSensors = 22; //Believe it or not this is the distance between the sensors on the robot
   double angleInRadians = atan(abs(left-right)/(disBetweenSensors)); //returns angle to be parallel
   if (left < right) {
     return -abs(convertToDegrees(angleInRadians));
@@ -147,6 +147,24 @@ bool isUltrasonicGood() {
   return trustworthy;
 }
 
+const float maxDrivePowerThreshold = 0.25;
+float convertToJoystickDrivePower(float drivePower) {
+  if(drivePower > maxDrivePowerThreshold) return 1;
+  return drivePower / maxDrivePowerThreshold;
+}
+
+const float maxStrafePowerThreshold = 0.60;
+float convertToJoystickStrafePower(float strafePower) {
+  if(strafePower > maxStrafePowerThreshold) return 1;
+  return strafePower / maxStrafePowerThreshold;
+}
+
+const float maxRotatePowerThreshold = 0.20;
+float convertToJoystickRotatePower(float rotatePower) {
+  if(rotatePower > maxRotatePowerThreshold) return 1;
+  return rotatePower / maxRotatePowerThreshold;
+}
+
 void updateUltrasonic() {
   left = ultrasonicLeft();
   right = ultrasonicRight();
@@ -161,7 +179,7 @@ void setup() {
 
 //print
 void loop() {
-  bool trustMe = true;
+  bool trustMe = false;
   double angle = 15.0;
   double distance = 12.0;
   updateUltrasonic();
@@ -177,7 +195,7 @@ void loop() {
     Serial.print(" ");
     Serial.print("\n");
 
-    updateDataForReplyToMaster(trustMe, getRotationInDegrees(), getDistance(), 0);
+    updateDataForReplyToMaster(trustMe, convertToJoystickRotatePower(getRotationInDegrees()), convertToJoystickDrivePower(getDistance()), 0);
   } else {
     trustMe = false;
     Serial.print("bad data");

@@ -33,11 +33,13 @@ void setup() {
   setupPixyCam();
 }
 
-//print
+//print++
 void loop() {
   Serial.print(canISeeLine());
   Serial.print(" -- ");
   Serial.print(getLineReference());
   Serial.print("\n");
+
+  pixy2.ccc.getBlocks();  
   updateDataForReplyToMaster(canISeeLine(), 0,0, getLineReference());
 }
